@@ -18,6 +18,7 @@
 #include "llvm/MC/MCContext.h"
 #include "llvm/MC/MCInstPrinter.h"
 #include "llvm/MC/MCInstrInfo.h"
+#include "llvm/MC/MCNaCl.h" // @LOCALMOD
 #include "llvm/MC/MCObjectFileInfo.h"
 #include "llvm/MC/MCObjectWriter.h"
 #include "llvm/MC/MCParser/AsmLexer.h"
@@ -542,7 +543,6 @@ int main(int argc, char **argv) {
     std::unique_ptr<MCCodeEmitter> CE;
     if (ShowEncoding)
       CE.reset(TheTarget->createMCCodeEmitter(*MCII, *MRI, Ctx));
-
     std::unique_ptr<MCAsmBackend> MAB(
         TheTarget->createMCAsmBackend(*STI, *MRI, MCOptions));
     auto FOut = std::make_unique<formatted_raw_ostream>(*OS);
@@ -550,6 +550,13 @@ int main(int argc, char **argv) {
         TheTarget->createAsmStreamer(Ctx, std::move(FOut), /*asmverbose*/ true,
                                      /*useDwarfDirectory*/ true, IP,
                                      std::move(CE), std::move(MAB), ShowInst));
+    // @LOCALMOD-START
+    Triple T(TripleName);
+    if (T.isOSNaCl()) {
+      Str->InitSections(NoExecStack);
+      initializeNaClMCStreamer(*Str.get(), Ctx, T);
+    }
+    // @LOCALMOD-END
 
   } else if (FileType == OFT_Null) {
     Str.reset(TheTarget->createNullStreamer(Ctx));
@@ -571,7 +578,17 @@ int main(int argc, char **argv) {
         MCOptions.MCIncrementalLinkerCompatible,
         /*DWARFMustBeAtTheEnd*/ false));
     if (NoExecStack)
-      Str->initSections(true, *STI);
+      Str->InitSections(true, *STI);
+
+    // @LOCALMOD-BEGIN
+    Triple T(TripleName);
+    if (T.isOSNaCl()) {
+      // If the above non-localmod does InitSections unconditionally,
+      // we can use that.
+      Str->InitSections(NoExecStack, *STI);
+      initializeNaClMCStreamer(*Str.get(), Ctx, T);
+    }
+    // @LOCALMOD-END
   }
 
   // Use Assembler information for parsing.

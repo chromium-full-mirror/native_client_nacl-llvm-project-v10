@@ -8,6 +8,7 @@ add_llvm_component_library(LLVMX86Desc
   X86MCTargetDesc.cpp
   X86MCAsmInfo.cpp
   X86MCCodeEmitter.cpp
+  X86MCNaClExpander.cpp # LOCALMOD
   X86MachObjectWriter.cpp
   X86ELFObjectWriter.cpp
   X86WinCOFFObjectWriter.cpp
