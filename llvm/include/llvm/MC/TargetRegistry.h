@@ -46,6 +46,7 @@ class MCDisassembler;
 class MCInstPrinter;
 class MCInstrAnalysis;
 class MCInstrInfo;
+class MCNaClExpander; // @LOCALMOD
 class MCObjectWriter;
 class MCRegisterInfo;
 class MCRelocationInfo;
@@ -230,6 +231,12 @@ public:
       mca::InstrumentManager *(*)(const MCSubtargetInfo &STI,
                                   const MCInstrInfo &MCII);
 
+  // @LOCALMOD-START
+  using MCNaClExpanderCtorTy = MCNaClExpander *(*)(
+      MCStreamer &S, std::unique_ptr<MCRegisterInfo> &&RegInfo,
+      std::unique_ptr<MCInstrInfo> &&InstInfo);
+  // @LOCALMOD-END
+
 private:
   /// Next - The next registered target in the linked list, maintained by the
   /// TargetRegistry.
@@ -339,6 +346,12 @@ private:
   /// InstrumentManagerCtorFn - Construction function for this target's
   /// InstrumentManager, if registered (default = nullptr).
   InstrumentManagerCtorTy InstrumentManagerCtorFn = nullptr;
+
+  // @LOCALMOD-START
+  // MCNaClExpanderCtorFn - Construction function for this target's
+  // MCNaClExpander, if registered.
+  MCNaClExpanderCtorTy MCNaClExpanderCtorFn;
+  // @LOCALMOD-END
 
 public:
   Target() = default;
@@ -537,6 +550,15 @@ public:
                                      std::unique_ptr<MCCodeEmitter> &&Emitter,
                                      const MCSubtargetInfo &STI, bool, bool,
                                      bool) const;
+
+  // @LOCALMOD-START
+  void createMCNaClExpander(MCStreamer &S,
+                            std::unique_ptr<MCRegisterInfo> &&RegInfo,
+                            std::unique_ptr<MCInstrInfo> &&InstInfo) const {
+    if (MCNaClExpanderCtorFn)
+      MCNaClExpanderCtorFn(S, std::move(RegInfo), std::move(InstInfo));
+  }
+  // @LOCALMOD-END
 
   MCStreamer *createAsmStreamer(MCContext &Ctx,
                                 std::unique_ptr<formatted_raw_ostream> OS,
@@ -890,7 +912,13 @@ struct TargetRegistry {
   /// @param T - The target being registered.
   /// @param Fn - A function to construct an MCInstPrinter for the target.
   static void RegisterMCInstPrinter(Target &T, Target::MCInstPrinterCtorTy Fn) {
+    // @LOCALMOD-BEGIN
+    // Prune out the .s printer for the sandboxed translator,
+    // by preventing an InstPrinter from being used at all.
+    #if !defined(__native_client__)
     T.MCInstPrinterCtorFn = Fn;
+    #endif
+    // @LOCALMOD-END
   }
 
   /// RegisterMCCodeEmitter - Register a MCCodeEmitter implementation for the
@@ -1007,6 +1035,13 @@ struct TargetRegistry {
                                         Target::InstrumentManagerCtorTy Fn) {
     T.InstrumentManagerCtorFn = Fn;
   }
+
+  // @LOCALMOD-START
+  static void RegisterMCNaClExpander(Target &T,
+                                     Target::MCNaClExpanderCtorTy Fn) {
+    T.MCNaClExpanderCtorFn = Fn;
+  }
+  // @LOCALMOD-END
 
   /// @}
 };

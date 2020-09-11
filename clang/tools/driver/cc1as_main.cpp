@@ -27,6 +27,7 @@
 #include "llvm/MC/MCCodeEmitter.h"
 #include "llvm/MC/MCContext.h"
 #include "llvm/MC/MCInstrInfo.h"
+#include "llvm/MC/MCNaCl.h" // @LOCALMOD
 #include "llvm/MC/MCObjectFileInfo.h"
 #include "llvm/MC/MCObjectWriter.h"
 #include "llvm/MC/MCParser/MCAsmParser.h"
@@ -577,6 +578,10 @@ static bool ExecuteAssemblerImpl(AssemblerInvocation &Opts,
     Str.reset(TheTarget->createMCObjectStreamer(
         T, Ctx, std::move(MAB), std::move(OW), std::move(CE), *STI));
     Str.get()->initSections(Opts.NoExecStack, *STI);
+    // @LOCALMOD-BEGIN
+    if (T.isOSNaCl())
+      initializeNaClMCStreamer(*Str.get(), Ctx, T);
+    // @LOCALMOD-END
     if (T.isOSBinFormatMachO() && T.isOSDarwin()) {
       Triple *TVT = Opts.DarwinTargetVariantTriple
                         ? &*Opts.DarwinTargetVariantTriple
