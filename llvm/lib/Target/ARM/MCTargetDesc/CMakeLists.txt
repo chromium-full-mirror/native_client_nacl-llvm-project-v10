@@ -8,6 +8,7 @@ add_llvm_component_library(LLVMARMDesc
   ARMMCAsmInfo.cpp
   ARMMCCodeEmitter.cpp
   ARMMCExpr.cpp
+  ARMMCNaClExpander.cpp # LOCALMOD
   ARMMCTargetDesc.cpp
   ARMTargetStreamer.cpp
   ARMUnwindOpAsm.cpp
