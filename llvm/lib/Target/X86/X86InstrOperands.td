@@ -342,6 +342,16 @@ def AVX512RC : Operand<i32> {
   let ParserMatchClass = AVX512RCOperand;
 }
 
+// LOCALMOD-BEGIN
+// TODO(fabiansommer): This was deleted upstream, check if there is a better
+// replacement.
+let OperandType = "OPERAND_PCREL",
+    ParserMatchClass = X86AbsMemAsmOperand,
+    PrintMethod = "printPCRelImm" in {
+def i32imm_pcrel : Operand<i32>;
+}
+// LOCALMOD-END
+
 // Sign-extended immediate classes. We don't need to define the full lattice
 // here because there is no instruction with an ambiguity between ImmSExti64i32
 // and ImmSExti32i8.
