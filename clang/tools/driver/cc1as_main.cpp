@@ -27,6 +27,7 @@
 #include "llvm/MC/MCCodeEmitter.h"
 #include "llvm/MC/MCContext.h"
 #include "llvm/MC/MCInstrInfo.h"
+#include "llvm/MC/MCNaCl.h" // @LOCALMOD
 #include "llvm/MC/MCObjectFileInfo.h"
 #include "llvm/MC/MCObjectWriter.h"
 #include "llvm/MC/MCParser/MCAsmParser.h"
@@ -489,7 +490,11 @@ static bool ExecuteAssemblerImpl(AssemblerInvocation &Opts,
         T, Ctx, std::move(MAB), std::move(OW), std::move(CE), *STI,
         Opts.RelaxAll, Opts.IncrementalLinkerCompatible,
         /*DWARFMustBeAtTheEnd*/ true));
-    Str.get()->initSections(Opts.NoExecStack, *STI);
+    Str.get()->InitSections(Opts.NoExecStack, *STI);
+    // @LOCALMOD-BEGIN
+    if (T.isOSNaCl())
+      initializeNaClMCStreamer(*Str.get(), Ctx, T);
+    // @LOCALMOD-END
   }
 
   // When -fembed-bitcode is passed to clang_as, a 1-byte marker
