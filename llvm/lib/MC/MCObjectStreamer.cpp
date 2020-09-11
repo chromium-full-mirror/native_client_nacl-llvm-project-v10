@@ -15,6 +15,7 @@
 #include "llvm/MC/MCContext.h"
 #include "llvm/MC/MCDwarf.h"
 #include "llvm/MC/MCExpr.h"
+#include "llvm/MC/MCNaClExpander.h" // @LOCALMOD
 #include "llvm/MC/MCObjectWriter.h"
 #include "llvm/MC/MCSection.h"
 #include "llvm/MC/MCSymbol.h"
@@ -379,8 +380,16 @@ void MCObjectStreamer::emitInstruction(const MCInst &Inst,
 void MCObjectStreamer::emitInstructionImpl(const MCInst &Inst,
                                            const MCSubtargetInfo &STI) {
   MCStreamer::emitInstruction(Inst, STI);
-
+  // @LOCALMOD-START
+  // TODO figure out if this should become part of EmitInstruction
   MCSection *Sec = getCurrentSectionOnly();
+  if (!Sec->isBundleLocked() && NaClExpander && NaClExpander->expandInst(Inst, *this, STI))
+    return;
+  // @LOCALMOD-END
+
+  MCStreamer::emitInstruction(Inst, STI);
+
+  //MCSection *Sec = getCurrentSectionOnly();
   Sec->setHasInstructions(true);
 
   // Now that a machine instruction has been assembled into this section, make
