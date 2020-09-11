@@ -48,6 +48,7 @@ include "X86InstrCMovSetCC.td"
 include "X86InstrConditionalCompare.td"
 include "X86InstrExtension.td"
 include "X86InstrControl.td"
+//include "X86InstrNaCl.td" // @LOCALMOD
 include "X86InstrShiftRotate.td"
 
 // X87 Floating Point Stack.
