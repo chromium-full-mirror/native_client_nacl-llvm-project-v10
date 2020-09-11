@@ -22,6 +22,7 @@
 #include "llvm/MC/MCFixupKindInfo.h"
 #include "llvm/MC/MCInst.h"
 #include "llvm/MC/MCInstPrinter.h"
+#include "llvm/MC/MCNaClExpander.h" // @LOCALMOD
 #include "llvm/MC/MCObjectFileInfo.h"
 #include "llvm/MC/MCObjectWriter.h"
 #include "llvm/MC/MCPseudoProbe.h"
@@ -58,6 +59,7 @@ class MCAsmStreamer final : public MCStreamer {
   unsigned IsVerboseAsm : 1;
   unsigned ShowInst : 1;
   unsigned UseDwarfDirectory : 1;
+  unsigned BundleLocked : 1; // @LOCALMOD
 
   void EmitRegisterName(int64_t Register);
   void PrintQuotedString(StringRef Data, raw_ostream &OS) const;
@@ -2253,6 +2255,12 @@ void MCAsmStreamer::emitInstruction(const MCInst &Inst,
   assert(getCurrentSectionOnly() &&
          "Cannot emit contents before setting section!");
 
+  // @LOCALMOD-START
+  if (NaClExpander && !BundleLocked &&
+      NaClExpander->expandInst(Inst, *this, STI))
+    return;
+  // @LOCALMOD-END
+
   if (!MAI->usesDwarfFileAndLocDirectives())
     // Now that a machine instruction has been assembled into this section, make
     // a line entry for any .loc directive that has been seen.
@@ -2300,11 +2308,13 @@ void MCAsmStreamer::emitBundleLock(bool AlignToEnd) {
   OS << "\t.bundle_lock";
   if (AlignToEnd)
     OS << " align_to_end";
+  BundleLocked = true; // @LOCALMOD
   EmitEOL();
 }
 
 void MCAsmStreamer::emitBundleUnlock() {
   OS << "\t.bundle_unlock";
+  BundleLocked = false; // @LOCALMOD
   EmitEOL();
 }
 
