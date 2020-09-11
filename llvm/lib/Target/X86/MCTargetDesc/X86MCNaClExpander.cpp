@@ -611,35 +611,14 @@ void X86::X86MCNaClExpander::doExpandInst(const MCInst &Inst,
                                           MCStreamer &Out,
                                           const MCSubtargetInfo &STI,
                                           bool EmitPrefixes) {
-  // Explicitly IGNORE all pseudo instructions, these will be handled in the
+  // Previously: Explicitly IGNORE all pseudo instructions, these will be handled in the
   // older customExpandInst code
-  // TODO(fabiansommer): Check that the older customExpandInst is actually there
-  // Or maybe this is just dead code.
+  // Currently, it ignores direct calls.
+  // TODO(dschuff): This is valid, but is it correct when using sandbox-base-hiding? (or
+  // do we avoid calls elsewhere?)
   switch (Inst.getOpcode()) {
   case X86::CALLpcrel32:
-  case X86::CALL64pcrel32:/*
-  case X86::NACL_CALL64d:
-  case X86::NACL_CALL32r:
-  case X86::NACL_CALL64r:
-  case X86::NACL_JMP32r:
-  case X86::NACL_JMP64r:
-  case X86::NACL_JMP64z:
-  case X86::NACL_RET32:
-  case X86::NACL_RET64:
-  case X86::NACL_RETI32:
-  case X86::NACL_ASPi8:
-  case X86::NACL_ASPi32:
-  case X86::NACL_SSPi8:
-  case X86::NACL_SSPi32:
-  case X86::NACL_ANDSPi8:
-  case X86::NACL_ANDSPi32:
-  case X86::NACL_SPADJi32:
-  case X86::NACL_RESTBPm:
-  case X86::NACL_RESTBPr:
-  case X86::NACL_RESTBPrz:
-  case X86::NACL_RESTSPm:
-  case X86::NACL_RESTSPr:
-  case X86::NACL_RESTSPrz:*/
+  case X86::CALL64pcrel32:
     emitInstruction(Inst, Out, STI, EmitPrefixes);
     return;
   default:
