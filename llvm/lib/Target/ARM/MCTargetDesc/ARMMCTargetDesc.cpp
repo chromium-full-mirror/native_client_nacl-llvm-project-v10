@@ -14,6 +14,7 @@
 #include "ARMBaseInfo.h"
 #include "ARMInstPrinter.h"
 #include "ARMMCAsmInfo.h"
+#include "ARMMCNaClExpander.h" // @LOCALMOD
 #include "TargetInfo/ARMTargetInfo.h"
 #include "llvm/ADT/Triple.h"
 #include "llvm/MC/MCAsmBackend.h"
@@ -352,6 +353,17 @@ bool ARM::isCDECoproc(size_t Coproc, const MCSubtargetInfo &STI) {
   return STI.getFeatureBits()[ARM::FeatureCoprocCDE0 + Coproc];
 }
 
+// @LOCALMOD-START
+static MCNaClExpander *createARMMCNaClExpander(MCStreamer &S,
+                                    std::unique_ptr<MCRegisterInfo> &&RegInfo,
+                                    std::unique_ptr<MCInstrInfo> &&InstInfo) {
+  auto *Exp = new ARM::ARMMCNaClExpander(S.getContext(), std::move(RegInfo),
+                                         std::move(InstInfo));
+  S.setNaClExpander(Exp);
+  return Exp;
+}
+// @LOCALMOD-END
+
 // Force static initialization.
 extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeARMTargetMC() {
   for (Target *T : {&getTheARMLETarget(), &getTheARMBETarget(),
@@ -370,8 +382,14 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeARMTargetMC() {
                                             ARM_MC::createARMMCSubtargetInfo);
 
     TargetRegistry::RegisterELFStreamer(*T, createELFStreamer);
+#ifndef __native_client__ // @LOCALMOD but may not be needed for autosandboxing
     TargetRegistry::RegisterCOFFStreamer(*T, createARMWinCOFFStreamer);
     TargetRegistry::RegisterMachOStreamer(*T, createARMMachOStreamer);
+#endif // @LOCALMOD
+
+    // @LOCALMOD-START
+    TargetRegistry::RegisterMCNaClExpander(*T, createARMMCNaClExpander);
+    // @LOCALMOD-END
 
     // Register the obj target streamer.
     TargetRegistry::RegisterObjectTargetStreamer(*T,

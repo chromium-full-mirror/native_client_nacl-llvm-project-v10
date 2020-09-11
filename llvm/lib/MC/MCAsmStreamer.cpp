@@ -22,6 +22,7 @@
 #include "llvm/MC/MCFixupKindInfo.h"
 #include "llvm/MC/MCInst.h"
 #include "llvm/MC/MCInstPrinter.h"
+#include "llvm/MC/MCNaClExpander.h" // @LOCALMOD
 #include "llvm/MC/MCObjectFileInfo.h"
 #include "llvm/MC/MCObjectWriter.h"
 #include "llvm/MC/MCRegister.h"
@@ -57,6 +58,7 @@ class MCAsmStreamer final : public MCStreamer {
   unsigned IsVerboseAsm : 1;
   unsigned ShowInst : 1;
   unsigned UseDwarfDirectory : 1;
+  unsigned BundleLocked : 1; // @LOCALMOD
 
   void EmitRegisterName(int64_t Register);
   void emitCFIStartProcImpl(MCDwarfFrameInfo &Frame) override;
@@ -2034,6 +2036,12 @@ void MCAsmStreamer::emitInstruction(const MCInst &Inst,
   assert(getCurrentSectionOnly() &&
          "Cannot emit contents before setting section!");
 
+  // @LOCALMOD-START
+  if (NaClExpander && !BundleLocked &&
+      NaClExpander->expandInst(Inst, *this, STI))
+    return;
+  // @LOCALMOD-END
+
   // Show the encoding in a comment if we have a code emitter.
   AddEncodingComment(Inst, STI);
 
@@ -2064,11 +2072,13 @@ void MCAsmStreamer::emitBundleLock(bool AlignToEnd) {
   OS << "\t.bundle_lock";
   if (AlignToEnd)
     OS << " align_to_end";
+  BundleLocked = true; // @LOCALMOD
   EmitEOL();
 }
 
 void MCAsmStreamer::emitBundleUnlock() {
   OS << "\t.bundle_unlock";
+  BundleLocked = false; // @LOCALMOD
   EmitEOL();
 }
 

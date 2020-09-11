@@ -4,6 +4,8 @@
 // See https://llvm.org/LICENSE.txt for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
+// This file was written by the Native Client authors.
+//
 //===----------------------------------------------------------------------===//
 //
 // This file declares the MCStreamer class.
@@ -20,6 +22,7 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/MC/MCDirectives.h"
 #include "llvm/MC/MCLinkerOptimizationHint.h"
+#include "llvm/MC/MCNaClExpander.h" // @LOCALMOD
 #include "llvm/MC/MCSymbol.h"
 #include "llvm/MC/MCWinEH.h"
 #include "llvm/Support/Error.h"
@@ -246,6 +249,8 @@ protected:
   /// Returns true if the the .cv_loc directive is in the right section.
   bool checkCVLocSection(unsigned FuncId, unsigned FileNo, SMLoc Loc);
 
+  std::unique_ptr<MCNaClExpander> NaClExpander; //@LOCALMOD
+
 public:
   MCStreamer(const MCStreamer &) = delete;
   MCStreamer &operator=(const MCStreamer &) = delete;
@@ -257,6 +262,12 @@ public:
   void setTargetStreamer(MCTargetStreamer *TS) {
     TargetStreamer.reset(TS);
   }
+
+  // @LOCALMOD-START
+  void setNaClExpander(MCNaClExpander *Exp) { NaClExpander.reset(Exp); }
+
+  MCNaClExpander *getNaClExpander() { return NaClExpander.get(); }
+  // @LOCALMOD-END
 
   /// State management
   ///

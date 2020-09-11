@@ -16,6 +16,7 @@
 #include "X86BaseInfo.h"
 #include "X86IntelInstPrinter.h"
 #include "X86MCAsmInfo.h"
+#include "X86MCNaClExpander.h" // @LOCALMOD
 #include "llvm/ADT/APInt.h"
 #include "llvm/ADT/Triple.h"
 #include "llvm/DebugInfo/CodeView/CodeView.h"
@@ -562,6 +563,31 @@ static MCInstrAnalysis *createX86MCInstrAnalysis(const MCInstrInfo *Info) {
   return new X86_MC::X86MCInstrAnalysis(Info);
 }
 
+// @LOCALMOD-START
+// TODO maybe the namespace has changed since last time
+static MCNaClExpander
+*createX86_32MCNaClExpander(MCStreamer &S,
+                           std::unique_ptr<MCRegisterInfo> &&RegInfo,
+                           std::unique_ptr<MCInstrInfo> &&InstInfo) {
+  auto *Exp =
+      new X86::X86MCNaClExpander(S.getContext(), std::move(RegInfo),
+                                 std::move(InstInfo), false /* Is64Bit */);
+  S.setNaClExpander(Exp);
+  return Exp;
+}
+
+static MCNaClExpander
+*createX86_64MCNaClExpander(MCStreamer &S,
+                           std::unique_ptr<MCRegisterInfo> &&RegInfo,
+                           std::unique_ptr<MCInstrInfo> &&InstInfo) {
+  auto *Exp =
+      new X86::X86MCNaClExpander(S.getContext(), std::move(RegInfo),
+                                 std::move(InstInfo), true /* Is64Bit */);
+  S.setNaClExpander(Exp);
+  return Exp;
+}
+// @LOCALMOD-END
+
 // Force static initialization.
 extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeX86TargetMC() {
   for (Target *T : {&getTheX86_32Target(), &getTheX86_64Target()}) {
@@ -605,6 +631,13 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeX86TargetMC() {
                                        createX86_32AsmBackend);
   TargetRegistry::RegisterMCAsmBackend(getTheX86_64Target(),
                                        createX86_64AsmBackend);
+
+  // @LOCALMOD-START
+  TargetRegistry::RegisterMCNaClExpander(getTheX86_32Target(),
+                                         createX86_32MCNaClExpander);
+  TargetRegistry::RegisterMCNaClExpander(getTheX86_64Target(),
+                                         createX86_64MCNaClExpander);
+  // @LOCALMOD-END
 }
 
 MCRegister llvm::getX86SubSuperRegisterOrZero(MCRegister Reg, unsigned Size,
@@ -785,5 +818,3 @@ MCRegister llvm::getX86SubSuperRegister(MCRegister Reg, unsigned Size, bool High
   assert(Res != X86::NoRegister && "Unexpected register or VT");
   return Res;
 }
-
-
