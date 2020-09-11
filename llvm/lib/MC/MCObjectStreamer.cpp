@@ -401,7 +401,6 @@ void MCObjectStreamer::emitInstruction(const MCInst &Inst,
 
 void MCObjectStreamer::emitInstructionImpl(const MCInst &Inst,
                                            const MCSubtargetInfo &STI) {
-  MCStreamer::emitInstruction(Inst, STI);
   // @LOCALMOD-START
   // TODO figure out if this should become part of EmitInstruction
   MCSection *Sec = getCurrentSectionOnly();
@@ -410,8 +409,6 @@ void MCObjectStreamer::emitInstructionImpl(const MCInst &Inst,
   // @LOCALMOD-END
 
   MCStreamer::emitInstruction(Inst, STI);
-
-  //MCSection *Sec = getCurrentSectionOnly();
   Sec->setHasInstructions(true);
 
   // Now that a machine instruction has been assembled into this section, make
