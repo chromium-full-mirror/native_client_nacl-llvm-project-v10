@@ -291,8 +291,8 @@
 
 	// Data type conversion
 
-	cvtsi2ssq %rax, %xmm0
-//CHECK:    	cvtsi2ssq	%rax, %xmm0
+	cvtsi2ss %rax, %xmm0
+//CHECK:    	cvtsi2ss	%rax, %xmm0
 
 	cvtsi2ssq 12(%rsp), %xmm0
 //CHECK:    	cvtsi2ssq	12(%rsp), %xmm0
@@ -304,8 +304,8 @@
 //CHECK-NEXT: 	.bundle_unlock
 
 
-	vcvtsi2ssq %rax, %xmm0, %xmm1
-//CHECK:    	vcvtsi2ssq	%rax, %xmm0, %xmm1
+	vcvtsi2ss %rax, %xmm0, %xmm1
+//CHECK:    	vcvtsi2ss	%rax, %xmm0, %xmm1
 
 	vcvtsi2ssq 12(%rsp), %xmm0, %xmm1
 //CHECK:    	vcvtsi2ssq	12(%rsp), %xmm0, %xmm1
