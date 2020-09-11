@@ -11,6 +11,7 @@ add_llvm_component_library(LLVMMCParser
   MCAsmParserExtension.cpp
   MCTargetAsmParser.cpp
   MasmParser.cpp
+  NaClAsmParser.cpp # LOCALMOD
   WasmAsmParser.cpp
   XCOFFAsmParser.cpp
 
