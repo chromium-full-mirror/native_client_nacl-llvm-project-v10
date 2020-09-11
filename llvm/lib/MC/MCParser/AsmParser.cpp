@@ -124,6 +124,7 @@ private:
   SourceMgr::DiagHandlerTy SavedDiagHandler;
   void *SavedDiagContext;
   std::unique_ptr<MCAsmParserExtension> PlatformParser;
+  std::unique_ptr<MCAsmParserExtension> NaClParser; // @LOCALMOD
   SMLoc StartTokLoc;
 
   /// This is the current buffer index we're lexing from as managed by the
@@ -762,6 +763,7 @@ extern MCAsmParserExtension *createCOFFAsmParser();
 extern MCAsmParserExtension *createGOFFAsmParser();
 extern MCAsmParserExtension *createXCOFFAsmParser();
 extern MCAsmParserExtension *createWasmAsmParser();
+extern MCAsmParserExtension *createNaClAsmParser(MCNaClExpander *Exp); // @LOCALMOD
 
 } // end namespace llvm
 
@@ -769,7 +771,7 @@ enum { DEFAULT_ADDRSPACE = 0 };
 
 AsmParser::AsmParser(SourceMgr &SM, MCContext &Ctx, MCStreamer &Out,
                      const MCAsmInfo &MAI, unsigned CB = 0)
-    : Lexer(MAI), Ctx(Ctx), Out(Out), MAI(MAI), SrcMgr(SM),
+    : Lexer(MAI), Ctx(Ctx), Out(Out), MAI(MAI), SrcMgr(SM), NaClParser(nullptr), // @LOCALMOD
       CurBuffer(CB ? CB : SM.getMainFileID()), MacrosEnabledFlag(true) {
   HadError = false;
   // Save the old handler.
@@ -812,6 +814,12 @@ AsmParser::AsmParser(SourceMgr &SM, MCContext &Ctx, MCStreamer &Out,
   }
 
   PlatformParser->Initialize(*this);
+  // @LOCALMOD-START
+  if (Out.getNaClExpander()) {
+    NaClParser.reset(createNaClAsmParser(Out.getNaClExpander()));
+    NaClParser->Initialize(*this);
+  }
+  // @LOCALMOD-END
   initializeDirectiveKindMap();
   initializeCVDefRangeTypeMap();
 
