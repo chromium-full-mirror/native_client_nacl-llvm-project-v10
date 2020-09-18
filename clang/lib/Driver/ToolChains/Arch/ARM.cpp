@@ -242,6 +242,10 @@ arm::FloatABI arm::getARMFloatABI(const Driver &D, const llvm::Triple &Triple,
       ABI = FloatABI::SoftFP;
       break;
 
+    case llvm::Triple::NaCl: // @LOCALMOD
+      ABI = FloatABI::Hard;
+      break;
+
     default:
       switch (Triple.getEnvironment()) {
       case llvm::Triple::GNUEABIHF:
