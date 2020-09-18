@@ -360,6 +360,10 @@ arm::FloatABI arm::getDefaultFloatABI(const llvm::Triple &Triple) {
   case llvm::Triple::OpenBSD:
     return FloatABI::SoftFP;
 
+  case llvm::Triple::NaCl: // @LOCALMOD
+    ABI = FloatABI::Hard;
+    break;
+
   default:
     switch (Triple.getEnvironment()) {
     case llvm::Triple::GNUEABIHF:
