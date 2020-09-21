@@ -1,0 +1,6 @@
+# This file is used by gcl to get repository specific information.
+CODE_REVIEW_SERVER: codereview.chromium.org
+CC_LIST: native-client-reviews@googlegroups.com
+VIEW_VC: https://chromium.googlesource.com/native_client/nacl-lllvm-project-v10/+/
+TRY_ON_UPLOAD: False
+GERRIT_HOST: True
