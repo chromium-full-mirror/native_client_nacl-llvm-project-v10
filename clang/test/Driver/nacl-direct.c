@@ -11,7 +11,9 @@
 // CHECK-I686: "-internal-isystem" "foo{{/|\\\\}}include"
 // CHECK-I686: "-internal-isystem" "{{.*}}{{/|\\\\}}..{{/|\\\\}}i686-nacl{{/|\\\\}}usr{{/|\\\\}}include"
 // CHECK-I686: "-internal-isystem" "{{.*}}{{/|\\\\}}..{{/|\\\\}}x86_64-nacl{{/|\\\\}}include"
-// CHECK-I686: as{{(.exe)?}}" "--32"
+// @LOCALMOD-START
+// CHECK-I686-NOT: as{{(.exe)?}}" "--32"
+// @LOCALMOD-END
 // CHECK-I686: ld{{(.exe)?}}"
 // CHECK-I686: "--build-id"
 // CHECK-I686: "-m" "elf_i386_nacl"
@@ -31,7 +33,9 @@
 // CHECK-x86_64: "-internal-isystem" "foo{{/|\\\\}}include"
 // CHECK-x86_64: "-internal-isystem" "{{.*}}{{/|\\\\}}..{{/|\\\\}}x86_64-nacl{{/|\\\\}}usr{{/|\\\\}}include"
 // CHECK-x86_64: "-internal-isystem" "{{.*}}{{/|\\\\}}..{{/|\\\\}}x86_64-nacl{{/|\\\\}}include"
-// CHECK-x86_64: as{{(.exe)?}}" "--64"
+// @LOCALMOD-START
+// CHECK-x86_64-NOT: as{{(.exe)?}}" "--64"
+// @LOCALMOD-END
 // CHECK-x86_64: ld{{(.exe)?}}"
 // CHECK-x86_64: "--build-id"
 // CHECK-x86_64: "-m" "elf_x86_64_nacl"
@@ -53,8 +57,9 @@
 // CHECK-ARM: "-internal-isystem" "foo{{/|\\\\}}include"
 // CHECK-ARM: "-internal-isystem" "{{.*}}{{/|\\\\}}..{{/|\\\\}}arm-nacl{{/|\\\\}}usr{{/|\\\\}}include"
 // CHECK-ARM: "-internal-isystem" "{{.*}}{{/|\\\\}}..{{/|\\\\}}arm-nacl{{/|\\\\}}include"
-// CHECK-ARM: as{{(.exe)?}}"
-// CHECK-ARM: "-mfloat-abi=hard"
+// @LOCALMOD-START
+// CHECK-ARM-NOT: as{{(.exe)?}}"
+// @LOCALMOD-END
 // CHECK-ARM: ld{{(.exe)?}}"
 // CHECK-ARM: "--build-id"
 // CHECK-ARM: "-m" "armelf_nacl"
@@ -95,8 +100,10 @@
 // CHECK-ARM-NOV7: "-triple" "armv7-unknown-nacl-gnueabihf"
 // CHECK-ARM-NOV7: "-target-abi" "aapcs-linux"
 // CHECK-ARM-NOV7: "-mfloat-abi" "hard"
-// CHECK-ARM-NOV7: as{{(.exe)?}}"
-// CHECK-ARM-NOV7: "-mfloat-abi=hard"
+// @LOCALMOD-START
+// CHECK-ARM-NOV7-NOT: as{{(.exe)?}}"
+// CHECK-ARM-NOV7-NOT: "-mfloat-abi=hard"
+// @LOCALMOD-END
 
 // Test clang c++ include dirs and link line when using clang++
 
