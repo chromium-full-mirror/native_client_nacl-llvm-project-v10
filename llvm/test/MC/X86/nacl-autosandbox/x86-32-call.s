@@ -5,7 +5,9 @@
 
 	call foo
 foo:
-// CHECK:	calll foo
+// CHECK:  .bundle_lock align_to_end
+// CHECK-NEXT:  calll foo
+// CHECK-NEXT:  .bundle_unlock
 
 	call *%eax
 // CHECK: 	.bundle_lock align_to_end
