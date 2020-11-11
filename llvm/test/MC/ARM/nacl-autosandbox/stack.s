@@ -1,4 +1,4 @@
-// RUN: llvm-mc -nacl-enable-auto-sandboxing -filetype asm -triple armv7-unknown-nacl %s | FileCheck %s
+// RUN: llvm-mc -filetype asm -triple armv7-unknown-nacl %s | FileCheck %s
 
 	mov sp, r1
 //CHECK:    .bundle_lock
@@ -188,6 +188,3 @@
 //CHECK-NEXT: 	bic	r0, r0, #-1073741824
 //CHECK-NEXT: 	stm	r0, {r1, sp}
 //CHECK-NEXT: 	.bundle_unlock
-
-	
-	
