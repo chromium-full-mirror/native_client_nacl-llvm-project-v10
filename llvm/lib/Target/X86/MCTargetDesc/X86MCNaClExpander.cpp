@@ -25,11 +25,6 @@
 #include "llvm/MC/MCStreamer.h"
 #include "llvm/Support/CommandLine.h"
 
-
-
-// TODO remove after debugging
-#include <iostream>
-
 using namespace llvm;
 
 static const int kBundleSize = 32;
@@ -37,6 +32,14 @@ static const int kBundleSize = 32;
 // For now, just setting it to its default.
 // extern cl::opt<bool> FlagHideSandboxBase;
 static bool FlagHideSandboxBase = true;
+
+cl::opt<bool> FlagUseX86CallConvention(
+    "nacl-use-x86-call-convention",
+    cl::desc("Use ECX/R11 as scratch registers for ret instructions. This is"
+             " safe as long as the code respects standard x86 calling"
+             " conventions, which specify these registers as scratch registers"
+             " for a return."),
+    cl::init(true));
 
 namespace {
 
@@ -288,10 +291,15 @@ void X86::X86MCNaClExpander::expandIndirectBranch(const MCInst &Inst,
 
 void X86::X86MCNaClExpander::expandReturn(const MCInst &Inst, MCStreamer &Out,
                                           const MCSubtargetInfo &STI) {
-  if (numScratchRegs() == 0)
-    Error(Inst, "No scratch registers specified.");
+  MCRegister ScratchReg;
+  if (FlagUseX86CallConvention) {
+    ScratchReg = Is64Bit ? X86::R11 : X86::ECX;
+  } else {
+    if (numScratchRegs() == 0)
+      Error(Inst, "No scratch registers specified.");
 
-  MCRegister ScratchReg = getScratchReg(0);
+    ScratchReg = getScratchReg(0);
+  }
 
   MCInst Pop;
   Pop.setOpcode(Is64Bit ? X86::POP64r : X86::POP32r);
