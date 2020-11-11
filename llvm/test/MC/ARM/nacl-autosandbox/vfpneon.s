@@ -1,4 +1,4 @@
-// RUN: llvm-mc -nacl-enable-auto-sandboxing -filetype asm -triple armv7-unknown-nacl %s 2>/dev/null | FileCheck %s
+// RUN: llvm-mc -filetype asm -triple armv7-unknown-nacl %s 2>/dev/null | FileCheck %s
 
 
 	vld1.8 { d0 }, [sp]
@@ -75,7 +75,7 @@
 //CHECK-NEXT: 	vld4ne.8	{d0, d1, d2, d3}, [r0], r1
 //CHECK-NEXT: 	.bundle_unlock
 
-	
+
 
 	vst1.8 { d0 }, [sp]
 //CHECK:    vst1.8	{d0}, [sp]
