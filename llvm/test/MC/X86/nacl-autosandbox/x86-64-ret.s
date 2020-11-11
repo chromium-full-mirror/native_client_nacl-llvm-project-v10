@@ -1,5 +1,4 @@
 // RUN: llvm-mc -filetype asm -triple x86_64-unknown-nacl %s | FileCheck %s --check-prefix=X8664
-.scratch %r11
 
 	ret
 //X8664:    	popq	%r11
