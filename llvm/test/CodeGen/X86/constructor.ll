@@ -5,7 +5,7 @@
 ; RUN: llc -mtriple x86_64-pc-linux < %s | FileCheck --check-prefix=INIT-ARRAY %s
 ; RUN: llc -mtriple x86_64-unknown-freebsd < %s | FileCheck --check-prefix=INIT-ARRAY %s
 ; RUN: llc -mtriple x86_64-pc-solaris2.11 < %s | FileCheck --check-prefix=INIT-ARRAY %s
-; RUN: llc -mtriple x86_64-unknown-nacl < %s | FileCheck --check-prefix=NACL %s
+; RUN: llc -mtriple x86_64-unknown-nacl -nacl-enable-autosandboxing=false < %s | FileCheck --check-prefix=NACL %s
 ; RUN: llc -mtriple i586-intel-elfiamcu -use-ctors < %s | FileCheck %s --check-prefix=MCU-CTORS
 ; RUN: llc -mtriple i586-intel-elfiamcu < %s | FileCheck %s --check-prefix=MCU-INIT-ARRAY
 ; RUN: llc -mtriple x86_64-win32-gnu < %s | FileCheck --check-prefix=COFF-CTOR %s
