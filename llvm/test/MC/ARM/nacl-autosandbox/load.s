@@ -1,4 +1,4 @@
-// RUN: llvm-mc -nacl-enable-auto-sandboxing -filetype asm -triple armv7-unknown-nacl %s 2>/dev/null | FileCheck %s
+// RUN: llvm-mc -filetype asm -triple armv7-unknown-nacl %s 2>/dev/null | FileCheck %s
 
 // No scratch registers should be needed for loads.
 
