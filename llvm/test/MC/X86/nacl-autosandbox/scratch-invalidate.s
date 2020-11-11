@@ -1,4 +1,4 @@
-// RUN: not llvm-mc -filetype asm -triple x86_64-unknown-nacl %s 2>&1 | FileCheck %s
+// RUN: not llvm-mc -filetype asm -triple x86_64-unknown-nacl -nacl-use-x86-call-convention=false %s 2>&1 | FileCheck %s
 
 .scratch %ecx
         mov (%rax, %rbx), %rax
