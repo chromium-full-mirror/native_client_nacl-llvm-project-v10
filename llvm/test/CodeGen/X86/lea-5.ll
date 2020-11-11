@@ -4,7 +4,7 @@
 
 ; RUN: llc < %s -mtriple=x86_64-linux -O2        | FileCheck %s
 ; RUN: llc < %s -mtriple=x86_64-linux-gnux32 -O2 | FileCheck %s -check-prefix=X32
-; RUN: llc < %s -mtriple=x86_64-nacl -O2 | FileCheck %s -check-prefix=X32
+; RUN: llc < %s -mtriple=x86_64-nacl -nacl-enable-autosandboxing=false -O2 | FileCheck %s -check-prefix=X32
 
 ; Function Attrs: nounwind readnone uwtable
 define void @foo(i32 %x, i32 %d) #0 {
@@ -56,4 +56,3 @@ while.cond:                                       ; preds = %while.cond, %entry
 while.end:                                        ; preds = %while.cond
   ret void
 }
-
