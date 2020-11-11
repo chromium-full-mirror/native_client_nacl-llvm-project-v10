@@ -2,7 +2,6 @@
 
 // Tests if the ret instruction is expanded correctly.
 
-.scratch %ecx
 	ret
 // CHECK:  	popl	%ecx
 // CHECK-NEXT: 	.bundle_lock
