@@ -1,4 +1,4 @@
-// RUN: llvm-mc -nacl-enable-auto-sandboxing -filetype asm -triple x86_64-unknown-nacl %s | FileCheck %s --check-prefix=X8664
+// RUN: llvm-mc -filetype asm -triple x86_64-unknown-nacl %s | FileCheck %s --check-prefix=X8664
 /* NaCl should not need to compile x87 code, so this test is disabled. */
 // XFAIL: *
 .scratch %r11
