@@ -32,6 +32,7 @@
 #include "llvm/MC/MCCodeEmitter.h"
 #include "llvm/MC/MCContext.h"
 #include "llvm/MC/MCExpr.h"
+#include "llvm/MC/MCNaCl.h" // @LOCALMOD
 #include "llvm/MC/MCSectionCOFF.h"
 #include "llvm/MC/MCSectionELF.h"
 #include "llvm/MC/MCSectionMachO.h"
@@ -697,6 +698,11 @@ void X86AsmPrinter::emitStartOfAsmFile(Module &M) {
   bool is16 = TT.getEnvironment() == Triple::CODE16;
   if (M.getModuleInlineAsm().empty() && is16)
     OutStreamer->emitAssemblerFlag(MCAF_Code16);
+
+  // @LOCALMOD-BEGIN
+  if (TT.isOSNaCl())
+    initializeNaClMCStreamer(*OutStreamer.get(), OutContext, TT);
+  // @LOCALMOD-END
 }
 
 static void
