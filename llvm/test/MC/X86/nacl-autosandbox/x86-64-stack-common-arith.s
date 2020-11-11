@@ -1,4 +1,4 @@
-// RUN: llvm-mc -nacl-enable-auto-sandboxing -filetype asm -triple x86_64-unknown-nacl %s | FileCheck %s --check-prefix=X8664
+// RUN: llvm-mc -filetype asm -triple x86_64-unknown-nacl %s | FileCheck %s --check-prefix=X8664
 .scratch %r11
 
 	add $12, %rsp
@@ -9,7 +9,7 @@
 
 	add $131072, %rsp
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	addl	$131072, %esp           
+//X8664-NEXT: 	addl	$131072, %esp
 //X8664-NEXT: 	leaq	(%rsp,%r15), %rsp
 //X8664-NEXT: 	.bundle_unlock
 
@@ -40,7 +40,7 @@
 
 	sub $131072, %rsp
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	subl	$131072, %esp           
+//X8664-NEXT: 	subl	$131072, %esp
 //X8664-NEXT: 	leaq	(%rsp,%r15), %rsp
 //X8664-NEXT: 	.bundle_unlock
 
@@ -53,7 +53,7 @@
 
 	sub $131072, %rbp
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	subl	$131072, %ebp           
+//X8664-NEXT: 	subl	$131072, %ebp
 //X8664-NEXT: 	leaq	(%rbp,%r15), %rbp
 //X8664-NEXT: 	.bundle_unlock
 
@@ -69,7 +69,7 @@
 
 	and $131072, %rsp
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	andl	$131072, %esp           
+//X8664-NEXT: 	andl	$131072, %esp
 //X8664-NEXT: 	leaq	(%rsp,%r15), %rsp
 //X8664-NEXT: 	.bundle_unlock
 
@@ -82,7 +82,7 @@
 
 	and $131072, %rbp
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	andl	$131072, %ebp           
+//X8664-NEXT: 	andl	$131072, %ebp
 //X8664-NEXT: 	leaq	(%rbp,%r15), %rbp
 //X8664-NEXT: 	.bundle_unlock
 
@@ -130,7 +130,7 @@
 //X8664-NEXT: 	.bundle_unlock
 //X8664-NEXT: 	leaq	(%rbp,%r15), %rbp
 //X8664-NEXT: 	.bundle_unlock
-	
+
 
 	lea (%rax, %rbx), %rsp
 //X8664:    	.bundle_lock
@@ -162,4 +162,3 @@
 //X8664-NEXT: 	leal	(%rax,%rbx), %ebp
 //X8664-NEXT: 	leaq	(%rbp,%r15), %rbp
 //X8664-NEXT: 	.bundle_unlock
-

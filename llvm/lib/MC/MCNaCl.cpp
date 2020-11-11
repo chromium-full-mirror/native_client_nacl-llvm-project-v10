@@ -22,10 +22,10 @@ static const char NoteNamespace[] = "NaCl";
 
 namespace llvm {
 
-cl::opt<bool> FlagAutoSandboxing("nacl-enable-auto-sandboxing",
-                                 cl::desc("Use auto-sandboxing assembler"
-                                          " for the NaCl SFI."),
-                                 cl::init(false));
+cl::opt<bool> FlagEnableAutoSandboxing("nacl-enable-autosandboxing",
+                                cl::desc("Don't use the autosandboxing"
+                                         " assembler for the NaCl SFI."),
+                                cl::init(true));
 
 void initializeNaClMCStreamer(MCStreamer &Streamer, MCContext &Ctx,
                               const Triple &TheTriple) {
@@ -64,11 +64,12 @@ void initializeNaClMCStreamer(MCStreamer &Streamer, MCContext &Ctx,
 
   // Create the Target specific MCNaClExpander
   assert(TheTarget != nullptr);
-  if (FlagAutoSandboxing) {
+  if (FlagEnableAutoSandboxing) {
     TheTarget->createMCNaClExpander(
-        Streamer, std::unique_ptr<MCRegisterInfo>(
-                      TheTarget->createMCRegInfo(TheTriple.getTriple())),
-        std::unique_ptr<MCInstrInfo>(TheTarget->createMCInstrInfo()));
+      Streamer,
+      std::unique_ptr<MCRegisterInfo>(
+          TheTarget->createMCRegInfo(TheTriple.getTriple())),
+      std::unique_ptr<MCInstrInfo>(TheTarget->createMCInstrInfo()));
   }
 
   // Set bundle-alignment as required by the NaCl ABI for the target.
@@ -80,9 +81,10 @@ void initializeNaClMCStreamer(MCStreamer &Streamer, MCContext &Ctx,
       Streamer.hasRawTextSupport()) {
     Streamer.emitRawText("\t.dwarf_addr_size 4\n");
   }
+
   // Emit an ELF Note section in its own COMDAT group which identifies NaCl
   // object files to the gold linker, so it can use the NaCl layout.
-  MCSection *Note = Ctx.getELFSection(
+  MCSectionELF* Note = Ctx.getELFSection(
       NoteName, ELF::SHT_NOTE, ELF::SHF_ALLOC | ELF::SHF_GROUP, 0, NoteName);
 
   Streamer.PushSection();
