@@ -45,6 +45,9 @@ private:
 
   void emitPrefixes(MCStreamer &Out, const MCSubtargetInfo &STI);
 
+  void expandDirectCall(const MCInst &Inst, MCStreamer &Out,
+                        const MCSubtargetInfo &STI);
+
   void expandIndirectBranch(const MCInst &Inst, MCStreamer &Out,
                             const MCSubtargetInfo &STI);
 
