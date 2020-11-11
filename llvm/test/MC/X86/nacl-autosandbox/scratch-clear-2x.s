@@ -1,4 +1,4 @@
-// RUN: llvm-mc -nacl-enable-auto-sandboxing -filetype asm -triple i386-unknown-nacl %s
+// RUN: llvm-mc -filetype asm -triple i386-unknown-nacl %s
 
 // Extra .scratch_clear directive. Should not fail.
 
