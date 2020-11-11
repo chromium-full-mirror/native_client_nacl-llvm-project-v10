@@ -1,4 +1,4 @@
-// RUN: llvm-mc -filetype asm -triple x86_64-unknown-nacl %s | FileCheck %s
+// RUN: llvm-mc -filetype asm -triple x86_64-unknown-nacl -nacl-use-x86-call-convention=false %s | FileCheck %s
 .scratch %r12
 .scratch %r11
 
