@@ -1,4 +1,4 @@
-// RUN: llvm-mc -nacl-enable-auto-sandboxing -filetype asm -triple x86_64-unknown-nacl %s | FileCheck %s
+// RUN: llvm-mc -filetype asm -triple x86_64-unknown-nacl %s | FileCheck %s
 
 .scratch %r11
 
@@ -21,7 +21,7 @@
 //CHECK-NEXT: 	leal	131072(%rax,%rdi,8), %r11d
 //CHECK-NEXT: 	addq	%rax, (%r15,%r11)
 //CHECK-NEXT: 	.bundle_unlock
-	
+
 
 	add 12(%rsp), %eax
 //CHECK:    	addl	12(%rsp), %eax
@@ -97,7 +97,7 @@
 //CHECK-NEXT: 	leal	131072(%rax,%rdi,8), %r11d
 //CHECK-NEXT: 	addb	%al, (%r15,%r11)
 //CHECK-NEXT: 	.bundle_unlock
-	
+
 // Test various integer/logic operations
 
 
@@ -187,7 +187,7 @@
 //CHECK-NEXT: 	leal	131072(%rax,%rdi,8), %r11d
 //CHECK-NEXT: 	imulq	(%r15,%r11), %rax
 //CHECK-NEXT: 	.bundle_unlock
-	
+
 
 	inc %rax
 //CHECK:    	incq	%rax
@@ -265,5 +265,3 @@
 //CHECK-NEXT: 	leal	131072(%rax,%rdi,8), %r11d
 //CHECK-NEXT: 	shlq	$7, (%r15,%r11)
 //CHECK-NEXT: 	.bundle_unlock
-
-	
