@@ -1,4 +1,4 @@
-// RUN: llvm-mc -nacl-enable-auto-sandboxing -filetype asm -triple armv7-unknown-nacl %s 2>/dev/null | FileCheck %s
+// RUN: llvm-mc -filetype asm -triple armv7-unknown-nacl %s 2>/dev/null | FileCheck %s
 .scratch r11
 
 	pld [pc]
@@ -20,7 +20,7 @@
 //CHECK-NEXT: 	bic	r11, r11, #-1073741824
 //CHECK-NEXT: 	pld	[r11]
 //CHECK-NEXT: 	.bundle_unlock
-	
+
 
 	pld [sp]
 //CHECK:    pld	[sp]
