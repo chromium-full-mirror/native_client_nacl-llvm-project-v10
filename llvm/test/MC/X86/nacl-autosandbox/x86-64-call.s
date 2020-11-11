@@ -4,7 +4,11 @@
 foo:
 
 	call foo
-//HIDEBASE:	callq 	foo
+
+//HIDEBASE:      pushq $.LDirectCallRetAddr{{[0-9]+}}
+//HIDEBASE-NEXT: jmp foo
+//HIDEBASE-NEXT: .p2align	5, 0x90
+//HIDEBASE-NEXT: .LDirectCallRetAddr{{[0-9]+}}:
 
 	call *%rax
 
