@@ -63,6 +63,16 @@ MCRegister getReg64(MCRegister Reg) {
   }
 }
 
+bool isDirectCall(const MCInst &Inst) {
+  switch (Inst.getOpcode()) {
+    case X86::CALLpcrel32:
+    case X86::CALL64pcrel32:
+      return true;
+    default:
+      return false;
+  }
+}
+
 } // namespace
 
 static unsigned demoteOpcode(unsigned Reg);
@@ -134,6 +144,48 @@ void X86::X86MCNaClExpander::emitSandboxBranchReg(MCRegister Reg, MCStreamer &Ou
     Add.addOperand(Target64);
     Add.addOperand(MCOperand::createReg(X86::R15));
     Out.emitInstruction(Add, STI);
+  }
+}
+
+void X86::X86MCNaClExpander::expandDirectCall(const MCInst &Inst,
+                                              MCStreamer &Out,
+                                              const MCSubtargetInfo &STI) {
+  const bool HideSandboxBase = FlagHideSandboxBase && Is64Bit;
+  if (HideSandboxBase) {
+    // For NaCl64, the sequence
+    //   call target
+    //   return_addr:
+    // is changed to
+    //   push return_addr
+    //   jmp target
+    //   .align 32
+    //   return_addr:
+    // This avoids exposing the sandbox base address via the return
+    // address on the stack.
+
+    MCContext &Context = Out.getContext();
+
+    // Generate a label for the return address.
+    MCSymbol *RetTarget = Context.createTempSymbol("DirectCallRetAddr", true);
+
+    PushReturnAddress(STI, Context, Out, RetTarget);
+
+    // jmp target
+    MCInst JMPInst;
+    JMPInst.setOpcode(X86::JMP_4);
+    JMPInst.addOperand(Inst.getOperand(0));
+    Out.emitInstruction(JMPInst, STI);
+
+    Out.emitCodeAlignment(kBundleSize);
+    Out.emitLabel(RetTarget);
+  } else {
+    Out.emitBundleLock(true);
+
+    MCInst CALLInst;
+    CALLInst.setOpcode(Is64Bit ? X86::CALL64pcrel32 : X86::CALLpcrel32);
+    CALLInst.addOperand(Inst.getOperand(0));
+    Out.emitInstruction(CALLInst, STI);
+    Out.emitBundleUnlock();
   }
 }
 
@@ -611,24 +663,12 @@ void X86::X86MCNaClExpander::doExpandInst(const MCInst &Inst,
                                           MCStreamer &Out,
                                           const MCSubtargetInfo &STI,
                                           bool EmitPrefixes) {
-  // Previously: Explicitly IGNORE all pseudo instructions, these will be handled in the
-  // older customExpandInst code
-  // Currently, it ignores direct calls.
-  // TODO(dschuff): This is valid, but is it correct when using sandbox-base-hiding? (or
-  // do we avoid calls elsewhere?)
-  switch (Inst.getOpcode()) {
-  case X86::CALLpcrel32:
-  case X86::CALL64pcrel32:
-    emitInstruction(Inst, Out, STI, EmitPrefixes);
-    return;
-  default:
-    break;
-  }
-
   if (isPrefix(Inst)) {
     return Prefixes.push_back(Inst);
   }
-  if (isIndirectBranch(Inst) || isCall(Inst)) {
+  if (isDirectCall(Inst)) {
+    expandDirectCall(Inst, Out, STI);
+  } else if (isIndirectBranch(Inst) || isCall(Inst)) {
     expandIndirectBranch(Inst, Out, STI);
   } else if (isReturn(Inst)) {
     expandReturn(Inst, Out, STI);
