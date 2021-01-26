@@ -4964,7 +4964,7 @@ void Clang::ConstructJob(Compilation &C, const JobAction &JA,
   }
 
   if (!Args.hasFlag(options::OPT_fjump_tables, options::OPT_fno_jump_tables,
-                    true))
+                    true) || TC.getTriple().isOSNaCl()) // @LOCALMOD
     CmdArgs.push_back("-fno-jump-tables");
 
   if (Args.hasFlag(options::OPT_fprofile_sample_accurate,
