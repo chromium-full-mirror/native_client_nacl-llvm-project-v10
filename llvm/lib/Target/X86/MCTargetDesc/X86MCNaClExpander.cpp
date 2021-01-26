@@ -24,8 +24,11 @@
 #include "llvm/MC/MCObjectFileInfo.h"
 #include "llvm/MC/MCStreamer.h"
 #include "llvm/Support/CommandLine.h"
+#include "llvm/Support/Debug.h"
 
 using namespace llvm;
+
+#define DEBUG_TYPE "saigo"
 
 static const int kBundleSize = 32;
 // 2020 notes this used to be defined as a build flag for performance testing.
@@ -74,6 +77,13 @@ bool isDirectCall(const MCInst &Inst) {
     default:
       return false;
   }
+}
+
+bool isValidReturnRegister(const MCRegister& Reg) {
+  return Reg == X86::EAX ||
+         Reg == X86::RAX ||
+         Reg == X86::AL ||
+         Reg == X86::AX;
 }
 
 } // namespace
@@ -256,11 +266,20 @@ void X86::X86MCNaClExpander::expandIndirectBranch(const MCInst &Inst,
 
     if (Is64Bit && FlagHideSandboxBase) {
       Target = X86::R11;
-    } else {
-      if (numScratchRegs() == 0)
-        Error(Inst, "Not enough scratch registers specified");
+    } else if (FlagUseX86CallConvention && isCall(Inst)) {
+      Target = Is64Bit ? X86::RCX : X86::ECX;
+    } else if (numScratchRegs()) {
       Target = getScratchReg(0);
+    } else {
+      if (isCall(Inst)) {
+        Error(Inst,
+              "Not enough scratch registers when expanding indirect call.");
+      } else {
+        Error(Inst,
+              "Not enough scratch registers when expanding indirect jump.");
+      }
     }
+
     Mov.addOperand(
         MCOperand::createReg(Is64Bit ? getReg64(Target) : getReg32(Target)));
     Mov.addOperand(Inst.getOperand(0));
@@ -296,7 +315,7 @@ void X86::X86MCNaClExpander::expandReturn(const MCInst &Inst, MCStreamer &Out,
     ScratchReg = Is64Bit ? X86::R11 : X86::ECX;
   } else {
     if (numScratchRegs() == 0)
-      Error(Inst, "No scratch registers specified.");
+      Error(Inst, "No scratch registers specified when expanding return.");
 
     ScratchReg = getScratchReg(0);
   }
@@ -308,18 +327,24 @@ void X86::X86MCNaClExpander::expandReturn(const MCInst &Inst, MCStreamer &Out,
   Out.emitInstruction(Pop, STI);
 
   if (Inst.getNumOperands() > 0) {
-    assert(Inst.getOpcode() == X86::RETIL || Inst.getOpcode() == X86::RETIQ);
-
-    MCOperand StackPointer =
+    if (Inst.getOpcode() == X86::RETIL || Inst.getOpcode() == X86::RETIQ) {
+      MCOperand StackPointer =
         MCOperand::createReg(Is64Bit ? X86::RSP : X86::ESP);
 
-    MCInst Add;
-    Add.setOpcode(Is64Bit ? X86::ADD64ri32 : X86::ADD32ri);
-    Add.addOperand(StackPointer);
-    Add.addOperand(StackPointer);
-    Add.addOperand(Inst.getOperand(0));
+      MCInst Add;
+      Add.setOpcode(Is64Bit ? X86::ADD64ri32 : X86::ADD32ri);
+      Add.addOperand(StackPointer);
+      Add.addOperand(StackPointer);
+      Add.addOperand(Inst.getOperand(0));
 
-    doExpandInst(Add, Out, STI, false);
+      doExpandInst(Add, Out, STI, false);
+    } else if (Inst.getOpcode() == X86::RETL || Inst.getOpcode() == X86::RETQ) {
+      assert(Inst.getOperand(0).isReg());
+      assert(isValidReturnRegister(Inst.getOperand(0).getReg()));
+    } else {
+      LLVM_DEBUG(Inst.dump());
+      Error(Inst, "Unexpected return instruction.");
+    }
   }
 
   emitIndirectJumpReg(ScratchReg, Out, STI);
@@ -370,10 +395,13 @@ void X86::X86MCNaClExpander::emitSandboxMemOp(MCInst &Inst, int MemIdx,
     Base.setReg(X86::R15);
   } else {
     MCRegister Scratch32 = 0;
-    if (ScratchReg != 0)
+    if (ScratchReg != 0) {
       Scratch32 = getReg32(ScratchReg);
-    else
-      Error(Inst, "Not enough scratch registers specified");
+    } else {
+      Error(Inst,
+          "Not enough scratch registers when emitting sandboxed memory operation."
+      );
+    }
 
     MCRegister Scratch64 = getReg64(Scratch32);
     MCRegister BaseReg64 = getReg64(Base.getReg());
