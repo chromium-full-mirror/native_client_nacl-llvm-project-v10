@@ -1,6 +1,8 @@
 // RUN: llvm-mc -filetype asm -triple x86_64-unknown-nacl %s | FileCheck %s --check-prefix=HIDEBASE
 
-.scratch %r11
+// Tests that calls are expanded correctly. %r11 is used as a scratch register
+// for calls by default.
+
 foo:
 
 	call foo
