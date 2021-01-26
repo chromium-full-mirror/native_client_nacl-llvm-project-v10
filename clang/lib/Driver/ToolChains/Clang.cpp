@@ -5256,8 +5256,10 @@ void Clang::ConstructJob(Compilation &C, const JobAction &JA,
     A->claim();
   }
 
-  Args.addOptOutFlag(CmdArgs, options::OPT_fjump_tables,
-                     options::OPT_fno_jump_tables);
+  if (!Args.hasFlag(options::OPT_fjump_tables, options::OPT_fno_jump_tables,
+                    true) || TC.getTriple().isOSNaCl()) // @LOCALMOD
+    CmdArgs.push_back("-fno-jump-tables");
+
   Args.addOptInFlag(CmdArgs, options::OPT_fprofile_sample_accurate,
                     options::OPT_fno_profile_sample_accurate);
   Args.addOptOutFlag(CmdArgs, options::OPT_fpreserve_as_comments,
