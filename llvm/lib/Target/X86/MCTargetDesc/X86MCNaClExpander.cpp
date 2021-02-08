@@ -271,6 +271,7 @@ void X86::X86MCNaClExpander::expandIndirectBranch(const MCInst &Inst,
     } else if (numScratchRegs()) {
       Target = getScratchReg(0);
     } else {
+      LLVM_DEBUG(Inst.dump());
       if (isCall(Inst)) {
         Error(Inst,
               "Not enough scratch registers when expanding indirect call.");
