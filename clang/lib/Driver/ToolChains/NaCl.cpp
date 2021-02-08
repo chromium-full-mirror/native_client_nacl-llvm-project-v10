@@ -302,6 +302,15 @@ void NaClToolChain::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
   addSystemInclude(DriverArgs, CC1Args, P.str());
 }
 
+// @LOCALMOD-START
+void NaClToolChain::addClangTargetOptions(const ArgList &DriverArgs,
+                                        ArgStringList &CC1Args,
+                                        Action::OffloadKind) const {
+  CC1Args.push_back("-fno-jump-tables");
+  CC1Args.push_back("-mdisable-tail-calls");
+}
+// @LOCALMOD-END
+
 void NaClToolChain::AddCXXStdlibLibArgs(const ArgList &Args,
                                         ArgStringList &CmdArgs) const {
   // Check for -stdlib= flags. We only support libc++ but this consumes the arg
