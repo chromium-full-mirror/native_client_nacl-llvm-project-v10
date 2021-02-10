@@ -1,4 +1,4 @@
-// RUN: llvm-mc -filetype asm -triple x86_64-unknown-nacl %s | FileCheck %s --check-prefix=X8664 --check-prefix=X64
+// RUN: llvm-mc -filetype asm -triple x86_64-unknown-nacl %s | FileCheck %s --check-prefix=X8664
 .scratch %r11
 
 	cmpxchg %rbx, %rdx
