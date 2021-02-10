@@ -169,17 +169,11 @@
 	movb 12(%rbp), %ah
 //X8664:    	movb	12(%rbp), %ah
 
-	movb 12(%r15), %ah
-//X8664:    	movb	12(%r15), %ah
-
 	movb 12(%rip), %ah
 //X8664:    	movb	12(%rip), %ah
 
 	movb -12(,%rbp), %ah
 //X8664:    	movb	-12(%rbp), %ah
-
-	movb -12(,%r15), %ah
-//X8664:    	movb	-12(%r15), %ah
 
 	movb 131072(%rsp, %rdi, 8), %ah
 //X8664:    	.bundle_lock
@@ -191,12 +185,6 @@
 //X8664:    	.bundle_lock
 //X8664-NEXT: 	movl	%edi, %edi
 //X8664-NEXT: 	movb	131072(%rbp,%rdi,8), %ah
-//X8664-NEXT: 	.bundle_unlock
-
-	movb 131072(%r15, %rdi, 8), %ah
-//X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%edi, %edi
-//X8664-NEXT: 	movb	131072(%r15,%rdi,8), %ah
 //X8664-NEXT: 	.bundle_unlock
 
 	movb 131072(%rax), %ah
