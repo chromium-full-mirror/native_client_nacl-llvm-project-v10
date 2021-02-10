@@ -211,8 +211,7 @@ arm::FloatABI arm::getDefaultFloatABI(const llvm::Triple &Triple) {
     return FloatABI::SoftFP;
 
   case llvm::Triple::NaCl: // @LOCALMOD
-    ABI = FloatABI::Hard;
-    break;
+    return FloatABI::Hard;
 
   default:
     switch (Triple.getEnvironment()) {
