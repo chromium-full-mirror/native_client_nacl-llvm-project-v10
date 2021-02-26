@@ -845,6 +845,14 @@ protected:
     DefineStd(Builder, "unix", Opts);
     Builder.defineMacro("__ELF__");
     Builder.defineMacro("__native_client__");
+    // LOCALMOD-START
+    Builder.defineMacro("__saigo__");
+    if (Triple.isX86()) {
+      Builder.defineMacro("NACLENTRYALIGN", "5");
+    } else if (Triple.isARM()) {
+      Builder.defineMacro("NACLENTRYALIGN", "4");
+    }
+    // LOCALMOD-END
   }
 
 public:
