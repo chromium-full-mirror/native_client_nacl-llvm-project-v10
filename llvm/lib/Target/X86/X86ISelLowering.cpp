@@ -83,6 +83,12 @@ static cl::opt<bool> MulConstantOptimization(
              "SHIFT, LEA, etc."),
     cl::Hidden);
 
+// @LOCALMOD-START
+static cl::opt<bool> X86DisallowBT(
+    "x86-disallow-bt", cl::init(false),
+    cl::desc("Don't use bt instructions that are illegal for NaCl in x86."));
+// @LOCALMOD-END
+
 X86TargetLowering::X86TargetLowering(const X86TargetMachine &TM,
                                      const X86Subtarget &STI)
     : TargetLowering(TM), Subtarget(STI) {
@@ -22768,6 +22774,13 @@ X86TargetLowering::BuildSDIVPow2(SDNode *N, const APInt &Divisor,
 static SDValue LowerAndToBT(SDValue And, ISD::CondCode CC, const SDLoc &dl,
                             SelectionDAG &DAG, X86::CondCode &X86CC) {
   assert(And.getOpcode() == ISD::AND && "Expected AND node!");
+
+  // @LOCALMOD-START
+  // NaCl validator rejects BT, BTS, and BTC.
+  if (X86DisallowBT)
+    return SDValue();
+  // @LOCALMOD-END
+
   SDValue Op0 = And.getOperand(0);
   SDValue Op1 = And.getOperand(1);
   if (Op0.getOpcode() == ISD::TRUNCATE)
