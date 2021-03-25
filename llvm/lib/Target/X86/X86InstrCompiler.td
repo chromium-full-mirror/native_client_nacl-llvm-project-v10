@@ -1674,11 +1674,14 @@ def BTCBTSMask64 : ImmLeaf<i64, [{
 // For now only do this for optsize.
 let AddedComplexity = 1, Predicates=[OptForSize] in {
   def : Pat<(and GR64:$src1, BTRMask64:$mask),
-            (BTR64ri8 GR64:$src1, (BTRXForm imm:$mask))>;
+            (BTR64ri8 GR64:$src1, (BTRXForm imm:$mask))>,
+            Requires<[NotNaCl]>; // @LOCALMOD
   def : Pat<(or GR64:$src1, BTCBTSMask64:$mask),
-            (BTS64ri8 GR64:$src1, (BTCBTSXForm imm:$mask))>;
+            (BTS64ri8 GR64:$src1, (BTCBTSXForm imm:$mask))>,
+            Requires<[NotNaCl]>; // @LOCALMOD
   def : Pat<(xor GR64:$src1, BTCBTSMask64:$mask),
-            (BTC64ri8 GR64:$src1, (BTCBTSXForm imm:$mask))>;
+            (BTC64ri8 GR64:$src1, (BTCBTSXForm imm:$mask))>,
+            Requires<[NotNaCl]>; // @LOCALMOD
 }
 
 
@@ -1967,24 +1970,30 @@ multiclass OneBitPats<RegisterClass rc, ValueType vt, Instruction btr,
                       Instruction bts, Instruction btc, PatFrag mask> {
   def : Pat<(and rc:$src1, (rotl -2, GR8:$src2)),
             (btr rc:$src1,
-                 (INSERT_SUBREG (vt (IMPLICIT_DEF)), GR8:$src2, sub_8bit))>;
+                 (INSERT_SUBREG (vt (IMPLICIT_DEF)), GR8:$src2, sub_8bit))>,
+                 Requires<[NotNaCl]>; // @LOCALMOD
   def : Pat<(or rc:$src1, (shl 1, GR8:$src2)),
             (bts rc:$src1,
-                 (INSERT_SUBREG (vt (IMPLICIT_DEF)), GR8:$src2, sub_8bit))>;
+                 (INSERT_SUBREG (vt (IMPLICIT_DEF)), GR8:$src2, sub_8bit))>,
+                 Requires<[NotNaCl]>; // @LOCALMOD
   def : Pat<(xor rc:$src1, (shl 1, GR8:$src2)),
             (btc rc:$src1,
-                 (INSERT_SUBREG (vt (IMPLICIT_DEF)), GR8:$src2, sub_8bit))>;
+                 (INSERT_SUBREG (vt (IMPLICIT_DEF)), GR8:$src2, sub_8bit))>,
+                 Requires<[NotNaCl]>; // @LOCALMOD
 
   // Similar to above, but removing unneeded masking of the shift amount.
   def : Pat<(and rc:$src1, (rotl -2, (mask GR8:$src2))),
             (btr rc:$src1,
-                 (INSERT_SUBREG (vt (IMPLICIT_DEF)), GR8:$src2, sub_8bit))>;
+                 (INSERT_SUBREG (vt (IMPLICIT_DEF)), GR8:$src2, sub_8bit))>,
+                 Requires<[NotNaCl]>; // @LOCALMOD
   def : Pat<(or rc:$src1, (shl 1, (mask GR8:$src2))),
             (bts rc:$src1,
-                (INSERT_SUBREG (vt (IMPLICIT_DEF)), GR8:$src2, sub_8bit))>;
+                (INSERT_SUBREG (vt (IMPLICIT_DEF)), GR8:$src2, sub_8bit))>,
+                 Requires<[NotNaCl]>; // @LOCALMOD
   def : Pat<(xor rc:$src1, (shl 1, (mask GR8:$src2))),
             (btc rc:$src1,
-                (INSERT_SUBREG (vt (IMPLICIT_DEF)), GR8:$src2, sub_8bit))>;
+                (INSERT_SUBREG (vt (IMPLICIT_DEF)), GR8:$src2, sub_8bit))>,
+                 Requires<[NotNaCl]>; // @LOCALMOD
 }
 
 defm : OneBitPats<GR16, i16, BTR16rr, BTS16rr, BTC16rr, shiftMask16>;
