@@ -3,6 +3,14 @@
 ; RUN: llc < %s -mtriple=x86_64-unknown-unknown | FileCheck %s --check-prefix=X64
 ; RUN: llc < %s -mtriple=x86_64-unknown-unknown -mattr=+avx512f | FileCheck %s --check-prefix=X64
 
+; @LOCALMOD-START
+; TODO(fabiansommer): Run this for x86-64 - currently this fails because it is
+; missing a scratch register when autosandboxing.
+; RUN: llc < %s -mtriple=i686-unknown-nacl -x86-disallow-bt=true | FileCheck %s --check-prefix=X86-NACL
+
+; X86-NACL-NOT: bt{{[^[:space:]]?[^[:space:]]?[[:space:]]}}
+; @LOCALMOD-END
+
 ; PR3253
 
 ; The register+memory form of the BT instruction should be usable on
