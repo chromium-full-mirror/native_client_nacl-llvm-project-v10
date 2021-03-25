@@ -2244,6 +2244,13 @@ void Clang::AddX86TargetArgs(const ArgList &Args,
     CmdArgs.push_back("-tune-cpu");
     CmdArgs.push_back(Args.MakeArgString(TuneCPU));
   }
+
+  // @LOCALMOD-BEGIN
+  if (getToolChain().getTriple().isOSNaCl()) {
+    CmdArgs.push_back("-mllvm");
+    CmdArgs.push_back("-x86-disallow-bt=true");
+  }
+  // @LOCALMOD-END
 }
 
 void Clang::AddHexagonTargetArgs(const ArgList &Args,

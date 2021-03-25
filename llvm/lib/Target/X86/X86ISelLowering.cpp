@@ -93,6 +93,12 @@ static cl::opt<bool> ExperimentalUnorderedISEL(
              "stores respectively."),
     cl::Hidden);
 
+// @LOCALMOD-START
+static cl::opt<bool> X86DisallowBT(
+    "x86-disallow-bt", cl::init(false),
+    cl::desc("Don't use bt instructions that are illegal for NaCl in x86."));
+// @LOCALMOD-END
+
 /// Call this when the user attempts to do something unsupported, like
 /// returning a double without SSE2 enabled on x86_64. This is not fatal, unlike
 /// report_fatal_error, so calling code should attempt to recover without
@@ -23393,6 +23399,13 @@ static SDValue LowerAndToBT(SDValue And, ISD::CondCode CC,
                             const SDLoc &dl, SelectionDAG &DAG,
                             SDValue &X86CC) {
   assert(And.getOpcode() == ISD::AND && "Expected AND node!");
+
+  // @LOCALMOD-START
+  // NaCl validator rejects BT, BTS, and BTC.
+  if (X86DisallowBT)
+    return SDValue();
+  // @LOCALMOD-END
+
   SDValue Op0 = And.getOperand(0);
   SDValue Op1 = And.getOperand(1);
   if (Op0.getOpcode() == ISD::TRUNCATE)
