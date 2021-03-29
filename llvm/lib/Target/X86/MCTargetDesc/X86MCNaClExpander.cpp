@@ -83,7 +83,8 @@ bool isValidReturnRegister(const MCRegister& Reg) {
   return Reg == X86::EAX ||
          Reg == X86::RAX ||
          Reg == X86::AL ||
-         Reg == X86::AX;
+         Reg == X86::AX ||
+         Reg == X86::XMM0;
 }
 
 } // namespace
@@ -340,6 +341,7 @@ void X86::X86MCNaClExpander::expandReturn(const MCInst &Inst, MCStreamer &Out,
 
       doExpandInst(Add, Out, STI, false);
     } else if (Inst.getOpcode() == X86::RETL || Inst.getOpcode() == X86::RETQ) {
+      LLVM_DEBUG(Inst.dump());
       assert(Inst.getOperand(0).isReg());
       assert(isValidReturnRegister(Inst.getOperand(0).getReg()));
     } else {
