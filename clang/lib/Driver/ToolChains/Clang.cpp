@@ -2309,9 +2309,17 @@ void Clang::AddX86TargetArgs(const ArgList &Args,
   }
 
   // @LOCALMOD-BEGIN
-  if (getToolChain().getTriple().isOSNaCl()) {
-    CmdArgs.push_back("-mllvm");
-    CmdArgs.push_back("-x86-disallow-bt=true");
+  const llvm::Triple T = getToolChain().getTriple();
+  if (T.isOSNaCl()) {
+    if (T.isARM()) {
+      CmdArgs.push_back("-mllvm");
+      CmdArgs.push_back("-align-all-functions=4");
+    } else if (T.isX86()) {
+      CmdArgs.push_back("-mllvm");
+      CmdArgs.push_back("-align-all-functions=5");
+      CmdArgs.push_back("-mllvm");
+      CmdArgs.push_back("-x86-disallow-bt=true");
+    }
   }
   // @LOCALMOD-END
 }
