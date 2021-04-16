@@ -54,6 +54,8 @@ public:
                             llvm::opt::ArgStringList &CC1Args) const override;
 
   // @LOCALMOD-START
+  bool useRelaxRelocations() const override { return false; }
+
   void addClangTargetOptions(const llvm::opt::ArgList &DriverArgs,
                              llvm::opt::ArgStringList &CC1Args,
                              Action::OffloadKind) const override;
