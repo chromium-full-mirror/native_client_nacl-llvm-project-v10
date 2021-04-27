@@ -193,6 +193,12 @@ void X86::X86MCNaClExpander::expandDirectCall(const MCInst &Inst,
     Out.emitCodeAlignment(kBundleSize);
     Out.emitLabel(RetTarget);
   } else {
+    // Emit a nop in case the call is the first instruction of the function.
+    // Otherwise, the function label would lose its alignment as it is moved
+    // together with the call instruction.
+    MCInst NOPInst;
+    NOPInst.setOpcode(X86::NOOP);
+    Out.emitInstruction(NOPInst, STI);
     Out.emitBundleLock(true);
 
     MCInst CALLInst;
@@ -225,28 +231,34 @@ void X86::X86MCNaClExpander::emitIndirectCallReg(MCRegister Reg, MCStreamer &Out
 
   MCSymbol *RetTarget;
   MCContext &Context = Out.getContext();
+  MCOperand Target =
+      MCOperand::createReg(Is64Bit ? getReg64(Reg) : getReg32(Reg));
 
   if (Is64Bit && FlagHideSandboxBase) {
     // Generate a label for the return address.
     RetTarget = Context.createTempSymbol("IndirectCallRetAddr", true);
     PushReturnAddress(STI, Context, Out, RetTarget);
-  }
 
-  Out.emitBundleLock(!(Is64Bit && FlagHideSandboxBase));
-  emitSandboxBranchReg(Reg, Out, STI);
-
-  MCOperand Target =
-      MCOperand::createReg(Is64Bit ? getReg64(Reg) : getReg32(Reg));
-
-  if (Is64Bit && FlagHideSandboxBase) {
+    Out.emitBundleLock(false);
+    emitSandboxBranchReg(Reg, Out, STI);
     MCInst Jmp;
     Jmp.setOpcode(X86::JMP64r);
     Jmp.addOperand(Target);
     Out.emitInstruction(Jmp, STI);
     Out.emitBundleUnlock();
+
     Out.emitCodeAlignment(kBundleSize);
     Out.emitLabel(RetTarget);
   } else {
+    // Emit a nop in case the call is the first instruction of the function.
+    // Otherwise, the function label would lose its alignment as it is moved
+    // together with the following instructions.
+    MCInst NOPInst;
+    NOPInst.setOpcode(X86::NOOP);
+    Out.emitInstruction(NOPInst, STI);
+
+    Out.emitBundleLock(true);
+    emitSandboxBranchReg(Reg, Out, STI);
     MCInst Call;
     Call.setOpcode(Is64Bit ? X86::CALL64r : X86::CALL32r);
     Call.addOperand(Target);

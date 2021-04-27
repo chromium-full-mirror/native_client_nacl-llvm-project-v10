@@ -6,6 +6,7 @@
 
 	call *(%ebx)
 // CHECK:	movl (%ebx), %ecx
+// CHECK-NEXT:  nop
 // CHECK-NEXT: 	.bundle_lock align_to_end
 // CHECK-NEXT:  andl	$-32, %ecx
 // CHECK-NEXT:  calll	*%ecx
@@ -13,6 +14,7 @@
 
 	call *12(%ebx)
 // CHECK:	movl 12(%ebx), %ecx
+// CHECK-NEXT:  nop
 // CHECK-NEXT: 	.bundle_lock align_to_end
 // CHECK-NEXT:  andl	$-32, %ecx
 // CHECK-NEXT:  calll	*%ecx
@@ -20,6 +22,7 @@
 
 	call *-12(%ebx,%edx)
 // CHECK:	movl -12(%ebx,%edx), %ecx
+// CHECK-NEXT:  nop
 // CHECK-NEXT: 	.bundle_lock align_to_end
 // CHECK-NEXT:  andl	$-32, %ecx
 // CHECK-NEXT:  calll	*%ecx
@@ -27,6 +30,7 @@
 
 	call *-12(%ebx,%edx,4)
 // CHECK:	movl -12(%ebx,%edx,4), %ecx
+// CHECK-NEXT:  nop
 // CHECK-NEXT: 	.bundle_lock align_to_end
 // CHECK-NEXT:  andl	$-32, %ecx
 // CHECK-NEXT:  calll	*%ecx
