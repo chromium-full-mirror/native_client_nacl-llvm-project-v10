@@ -5,30 +5,35 @@
 
 	call foo
 foo:
-// CHECK:  .bundle_lock align_to_end
+// CHECK:       nop
+// CHECK-NEXT:  .bundle_lock align_to_end
 // CHECK-NEXT:  calll foo
 // CHECK-NEXT:  .bundle_unlock
 
 	call *%eax
-// CHECK: 	.bundle_lock align_to_end
+// CHECK:       nop
+// CHECK-NEXT: 	.bundle_lock align_to_end
 // CHECK-NEXT:  andl	$-32, %eax
 // CHECK-NEXT:  calll	*%eax
 // CHECK-NEXT:  .bundle_unlock
 
 	call *%ax
-// CHECK: 	.bundle_lock align_to_end
+// CHECK:       nop
+// CHECK-NEXT: 	.bundle_lock align_to_end
 // CHECK-NEXT:  andl	$-32, %eax
 // CHECK-NEXT:  calll	*%eax
 // CHECK-NEXT:  .bundle_unlock
 
 	call *%ecx
-// CHECK: 	.bundle_lock align_to_end
+// CHECK:       nop
+// CHECK-NEXT: 	.bundle_lock align_to_end
 // CHECK-NEXT:  andl	$-32, %ecx
 // CHECK-NEXT:  calll	*%ecx
 // CHECK-NEXT:  .bundle_unlock
 
 	call *(%ecx)
 // CHECK:	movl (%ecx), %ecx
+// CHECK-NEXT:  nop
 // CHECK-NEXT: 	.bundle_lock align_to_end
 // CHECK-NEXT:  andl	$-32, %ecx
 // CHECK-NEXT:  calll	*%ecx
@@ -36,6 +41,7 @@ foo:
 
 	call *12(%ecx)
 // CHECK:	movl 12(%ecx), %ecx
+// CHECK-NEXT:  nop
 // CHECK-NEXT: 	.bundle_lock align_to_end
 // CHECK-NEXT:  andl	$-32, %ecx
 // CHECK-NEXT:  calll	*%ecx
@@ -43,6 +49,7 @@ foo:
 
 	call *-12(%ecx,%edx)
 // CHECK:	movl -12(%ecx,%edx), %ecx
+// CHECK-NEXT:  nop
 // CHECK-NEXT: 	.bundle_lock align_to_end
 // CHECK-NEXT:  andl	$-32, %ecx
 // CHECK-NEXT:  calll	*%ecx
@@ -50,6 +57,7 @@ foo:
 
 	call *-12(%ecx,%edx,4)
 // CHECK:	movl -12(%ecx,%edx,4), %ecx
+// CHECK-NEXT:  nop
 // CHECK-NEXT: 	.bundle_lock align_to_end
 // CHECK-NEXT:  andl	$-32, %ecx
 // CHECK-NEXT:  calll	*%ecx
