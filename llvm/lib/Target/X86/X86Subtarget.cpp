@@ -271,7 +271,7 @@ void X86Subtarget::initSubtargetFeatures(StringRef CPU, StringRef TuneCPU,
   if (StackAlignOverride)
     stackAlignment = *StackAlignOverride;
   else if (isTargetDarwin() || isTargetLinux() || isTargetKFreeBSD() ||
-           In64BitMode)
+           isTargetNaCl() || In64BitMode) // @LOCALMOD
     stackAlignment = Align(16);
 
   // Consume the vector width attribute or apply any target specific limit.
