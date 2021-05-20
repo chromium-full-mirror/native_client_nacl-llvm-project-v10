@@ -598,6 +598,26 @@ BitVector X86RegisterInfo::getReservedRegs(const MachineFunction &MF) const {
     }
   }
 
+  // @LOCALMOD-START
+  const X86Subtarget& Subtarget = MF.getSubtarget<X86Subtarget>();
+  if (Subtarget.isTargetNaCl64()) {
+    Reserved.set(X86::R15);
+    Reserved.set(X86::R15D);
+    Reserved.set(X86::R15W);
+    Reserved.set(X86::R15B);
+    Reserved.set(X86::RBP);
+    Reserved.set(X86::EBP);
+    Reserved.set(X86::BP);
+    Reserved.set(X86::BPL);
+    // Restrict r11 so that it can be used for indirect jump sequences that
+    // don't leak the sandbox base address onto the stack.
+    Reserved.set(X86::R11);
+    Reserved.set(X86::R11D);
+    Reserved.set(X86::R11W);
+    Reserved.set(X86::R11B);
+  }
+  // @LOCALMOD-END
+
   assert(checkAllSuperRegsMarked(Reserved,
                                  {X86::SIL, X86::DIL, X86::BPL, X86::SPL,
                                   X86::SIH, X86::DIH, X86::BPH, X86::SPH}));
