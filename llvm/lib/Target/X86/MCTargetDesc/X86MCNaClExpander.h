@@ -72,7 +72,7 @@ private:
                         MCStreamer &Out, const MCSubtargetInfo &STI);
 
   bool emitSandboxMemOps(MCInst &Inst, MCRegister ScratchReg, MCStreamer &Out,
-                         const MCSubtargetInfo &STI);
+                         const MCSubtargetInfo &STI, bool EmitInstructions);
 
   void emitInstruction(const MCInst &Inst, MCStreamer &Out,
                        const MCSubtargetInfo &STI, bool EmitPrefixes);
