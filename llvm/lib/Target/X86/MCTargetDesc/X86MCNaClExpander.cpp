@@ -87,6 +87,10 @@ bool isValidReturnRegister(const MCRegister& Reg) {
          Reg == X86::XMM0;
 }
 
+bool isHighReg(MCRegister Reg) {
+  return Reg == X86::AH || Reg == X86::BH || Reg == X86::CH || Reg == X86::DH;
+}
+
 } // namespace
 
 static unsigned demoteOpcode(unsigned Reg);
@@ -470,10 +474,13 @@ static bool willEmitSandboxInsts(const MCInst &Inst, int Idx) {
 // Returns true if any instructions were emitted, otherwise false.
 // Note that this method can modify Inst, but still return false if no
 // auxiliary sandboxing instructions were emitted.
+// If EmitInstructions is set to false, this will not emit anything and return
+// whether it would emit any auxiliary instructions.
 bool X86::X86MCNaClExpander::emitSandboxMemOps(MCInst &Inst,
                                                MCRegister ScratchReg,
                                                MCStreamer &Out,
-                                               const MCSubtargetInfo &STI) {
+                                               const MCSubtargetInfo &STI,
+                                               bool EmitInstructions) {
 
   const MCOperandInfo *OpInfo = InstInfo->get(Inst.getOpcode()).OpInfo;
 
@@ -482,6 +489,9 @@ bool X86::X86MCNaClExpander::emitSandboxMemOps(MCInst &Inst,
   for (int i = 0, e = Inst.getNumOperands(); i < e; ++i) {
     if (OpInfo[i].OperandType == MCOI::OPERAND_MEMORY) {
       if (!anyInstsEmitted && willEmitSandboxInsts(Inst, i)) {
+        if (!EmitInstructions)
+          return true;
+
         Out.emitBundleLock(false);
         anyInstsEmitted = true;
       }
@@ -524,10 +534,63 @@ void X86::X86MCNaClExpander::expandLoadStore(const MCInst &Inst,
   else
     ScratchReg = 0;
 
-  bool BundleLock = emitSandboxMemOps(SandboxedInst, ScratchReg, Out, STI);
+  // Determine if the instruction requires sandboxing
+  bool InstNeedsSandboxing = emitSandboxMemOps(SandboxedInst,
+                                               ScratchReg,
+                                               Out,
+                                               STI,
+                                               /*EmitInstructions=*/false);
+
+  // We may want to load/store to a high byte register, which is not possible
+  // in combination with using R15 for sandboxing.
+  // Instead, rotate the target register so that the load/store operates on the
+  // low byte instead.
+  MCRegister RotateRegister = X86::NoRegister;
+  if (InstNeedsSandboxing &&
+      (SandboxedInst.getOpcode() == X86::MOV8rm_NOREX ||
+       SandboxedInst.getOpcode() == X86::MOV8rm) &&
+      isHighReg(SandboxedInst.getOperand(0).getReg())) {
+    RotateRegister = SandboxedInst.getOperand(0).getReg();
+    SandboxedInst.setOpcode(X86::MOV8rm);
+    SandboxedInst.getOperand(0).setReg(
+        getX86SubSuperRegisterOrZero(RotateRegister, 8, /*High=*/false));
+  } else if (InstNeedsSandboxing &&
+             (SandboxedInst.getOpcode() == X86::MOV8mr_NOREX ||
+              SandboxedInst.getOpcode() == X86::MOV8mr) &&
+             isHighReg(SandboxedInst.getOperand(5).getReg())) {
+    RotateRegister = SandboxedInst.getOperand(5).getReg();
+    SandboxedInst.setOpcode(X86::MOV8mr);
+    SandboxedInst.getOperand(5).setReg(
+        getX86SubSuperRegisterOrZero(RotateRegister, 8, /*High=*/false));
+  }
+
+  if (RotateRegister != X86::NoRegister) {
+    MCInst RotateHtoLInst;
+    RotateHtoLInst.setOpcode(X86::ROR64ri);
+    RotateHtoLInst.addOperand(MCOperand::createReg(getReg64(RotateRegister)));
+    RotateHtoLInst.addOperand(MCOperand::createReg(getReg64(RotateRegister)));
+    RotateHtoLInst.addOperand(MCOperand::createImm(8));
+    Out.emitInstruction(RotateHtoLInst, STI);
+  }
+
+  bool BundleLock = emitSandboxMemOps(SandboxedInst,
+                                      ScratchReg,
+                                      Out,
+                                      STI,
+                                      /*EmitInstructions=*/true);
   emitInstruction(SandboxedInst, Out, STI, EmitPrefixes);
   if (BundleLock)
     Out.emitBundleUnlock();
+
+  if (RotateRegister != X86::NoRegister) {
+    // Rotate the register back.
+    MCInst RotateLtoHInst;
+    RotateLtoHInst.setOpcode(X86::ROL64ri);
+    RotateLtoHInst.addOperand(MCOperand::createReg(getReg64(RotateRegister)));
+    RotateLtoHInst.addOperand(MCOperand::createReg(getReg64(RotateRegister)));
+    RotateLtoHInst.addOperand(MCOperand::createImm(8));
+    Out.emitInstruction(RotateLtoHInst, STI);
+  }
 }
 
 static bool isStringOperation(const MCInst &Inst) {
@@ -646,7 +709,11 @@ void X86::X86MCNaClExpander::expandExplicitStackManipulation(
   else
     ScratchReg = 0;
 
-  bool MemSandboxed = emitSandboxMemOps(SandboxedInst, ScratchReg, Out, STI);
+  bool MemSandboxed = emitSandboxMemOps(SandboxedInst,
+                                        ScratchReg,
+                                        Out,
+                                        STI,
+                                        /*emitInstructions=*/true);
 
   Out.emitBundleLock(false); // for stack fixup
 
