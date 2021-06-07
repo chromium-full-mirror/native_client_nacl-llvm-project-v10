@@ -63,6 +63,7 @@ X86RegisterInfo::X86RegisterInfo(const Triple &TT)
     // computation.
     // FIXME: Should use the data layout?
     bool Use64BitReg = TT.getEnvironment() != Triple::GNUX32;
+    if (TT.isOSNaCl()) Use64BitReg = false; // @LOCALMOD
     StackPtr = Use64BitReg ? X86::RSP : X86::ESP;
     FramePtr = Use64BitReg ? X86::RBP : X86::EBP;
     BasePtr = Use64BitReg ? X86::RBX : X86::EBX;

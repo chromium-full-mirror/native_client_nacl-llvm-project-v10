@@ -81,12 +81,14 @@ void X86ELFMCAsmInfo::anchor() { }
 
 X86ELFMCAsmInfo::X86ELFMCAsmInfo(const Triple &T) {
   bool is64Bit = T.getArch() == Triple::x86_64;
-  bool isX32 = T.getEnvironment() == Triple::GNUX32;
+  // @LOCALMOD-START
+  bool isILP32 = T.getEnvironment() == Triple::GNUX32 || T.isOSNaCl();
+  // @LOCALMOD-END
 
   // For ELF, x86-64 pointer size depends on the ABI.
   // For x86-64 without the x32 ABI, pointer size is 8. For x86 and for x86-64
   // with the x32 ABI, pointer size remains the default 4.
-  CodePointerSize = (is64Bit && !isX32) ? 8 : 4;
+  CodePointerSize = (is64Bit && !isILP32) ? 8 : 4; //@LOCALMOD
 
   // OTOH, stack slot size is always 8 for x86-64, even with the x32 ABI.
   CalleeSaveStackSlotSize = is64Bit ? 8 : 4;
