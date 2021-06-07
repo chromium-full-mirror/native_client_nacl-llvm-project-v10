@@ -91,6 +91,18 @@ bool isHighReg(MCRegister Reg) {
   return Reg == X86::AH || Reg == X86::BH || Reg == X86::CH || Reg == X86::DH;
 }
 
+// Detects movl %esp %ebp or movl %ebp %esp.
+bool is32BitStackPtrToFramePtrMove(const MCInst &Inst) {
+  return Inst.getOpcode() == X86::MOV32rr &&
+         Inst.getNumOperands() == 2 &&
+         Inst.getOperand(0).isReg() &&
+         Inst.getOperand(1).isReg() &&
+         ((Inst.getOperand(0).getReg() == X86::EBP &&
+           Inst.getOperand(1).getReg() == X86::ESP) ||
+          (Inst.getOperand(0).getReg() == X86::ESP &&
+           Inst.getOperand(1).getReg() == X86::EBP));
+}
+
 } // namespace
 
 static unsigned demoteOpcode(unsigned Reg);
@@ -700,6 +712,17 @@ void X86::X86MCNaClExpander::expandExplicitStackManipulation(
     if (-128 <= Imm && Imm <= -1 && StackReg == X86::RSP)
       return emitInstruction(Inst, Out, STI, EmitPrefixes);
   }
+  // Handle cases that don't directly access memory.
+  if (is32BitStackPtrToFramePtrMove(Inst)) {
+    // Transform movl %esp %ebp to movq %rsp %rbp to preserve upper 32 bits and
+    // to permit validation.
+    MCInst SandboxedInst(Inst);
+    SandboxedInst.setOpcode(X86::MOV64rr);
+    SandboxedInst.getOperand(0).setReg(getReg64(Inst.getOperand(0).getReg()));
+    SandboxedInst.getOperand(1).setReg(getReg64(Inst.getOperand(1).getReg()));
+    return emitInstruction(SandboxedInst, Out, STI, EmitPrefixes);
+  }
+
   MCInst SandboxedInst(Inst);
   demoteInst(SandboxedInst, *InstInfo);
 
