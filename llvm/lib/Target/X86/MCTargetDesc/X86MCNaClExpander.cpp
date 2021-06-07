@@ -103,6 +103,15 @@ bool is32BitStackPtrToFramePtrMove(const MCInst &Inst) {
            Inst.getOperand(1).getReg() == X86::EBP));
 }
 
+// Detects push %rsp and push %rbp.
+bool isStackRegPush(const MCInst &Inst) {
+  return Inst.getOpcode() == X86::PUSH64r &&
+         Inst.getNumOperands() == 1 &&
+         Inst.getOperand(0).isReg() &&
+         (Inst.getOperand(0).getReg() == X86::RBP ||
+          Inst.getOperand(0).getReg() == X86::RSP);
+}
+
 } // namespace
 
 static unsigned demoteOpcode(unsigned Reg);
@@ -701,13 +710,12 @@ void X86::X86MCNaClExpander::expandExplicitStackManipulation(
     MCRegister StackReg, const MCInst &Inst, MCStreamer &Out,
     const MCSubtargetInfo &STI, bool EmitPrefixes) {
   // First, handle special cases where sandboxing is not required.
-  // Pop, push are not handled because %rsp or %rbp is not explicitly
-  // defined
   if (Inst.getOpcode() == X86::MOV64rr) {
     MCRegister SrcReg = Inst.getOperand(1).getReg();
     if (SrcReg == X86::RSP || SrcReg == X86::RBP)
       return emitInstruction(Inst, Out, STI, EmitPrefixes);
-  } else if (Inst.getOpcode() == X86::AND64ri8) {
+  }
+  if (Inst.getOpcode() == X86::AND64ri8) {
     int Imm = Inst.getOperand(2).getImm();
     if (-128 <= Imm && Imm <= -1 && StackReg == X86::RSP)
       return emitInstruction(Inst, Out, STI, EmitPrefixes);
@@ -721,6 +729,39 @@ void X86::X86MCNaClExpander::expandExplicitStackManipulation(
     SandboxedInst.getOperand(0).setReg(getReg64(Inst.getOperand(0).getReg()));
     SandboxedInst.getOperand(1).setReg(getReg64(Inst.getOperand(1).getReg()));
     return emitInstruction(SandboxedInst, Out, STI, EmitPrefixes);
+  }
+  if (Inst.getOpcode() == X86::POP64r) {
+    // Transform
+    // pop   %rbp
+    // into
+    // pop %r11
+    // .bundle_lock
+    // movl %r11d, %ebp
+    // add %r15, %rbp
+    // .bundle_unlock
+    // where %r11 is the scratch register, and %rbp the stack register.
+
+    MCInst PopR11Inst;
+    PopR11Inst.setOpcode(X86::POP64r);
+    PopR11Inst.addOperand(MCOperand::createReg(X86::R11));
+    Out.emitInstruction(PopR11Inst, STI);
+
+    Out.emitBundleLock(false);
+
+    MCInst MovR11ToEBP;
+    MovR11ToEBP.setOpcode(X86::MOV32rr);
+    MovR11ToEBP.addOperand(MCOperand::createReg(getReg32(StackReg)));
+    MovR11ToEBP.addOperand(MCOperand::createReg(X86::R11D));
+    Out.emitInstruction(MovR11ToEBP, STI);
+
+    MCInst AddR15Inst;
+    AddR15Inst.setOpcode(X86::ADD64rr);
+    AddR15Inst.addOperand(MCOperand::createReg(StackReg));
+    AddR15Inst.addOperand(MCOperand::createReg(StackReg));
+    AddR15Inst.addOperand(MCOperand::createReg(X86::R15));
+    Out.emitInstruction(AddR15Inst, STI);
+
+    return Out.emitBundleUnlock();
   }
 
   MCInst SandboxedInst(Inst);
@@ -746,6 +787,26 @@ void X86::X86MCNaClExpander::expandExplicitStackManipulation(
   emitStackFixup(StackReg, Out, STI);
 
   Out.emitBundleUnlock(); // for stack fixup
+}
+
+void X86::X86MCNaClExpander::expandStackRegPush(const MCInst &Inst,
+                                                MCStreamer &Out,
+                                                const MCSubtargetInfo &STI) {
+  // Transform
+  // push   %rbp
+  // into
+  // movl   %ebp, %r11d
+  // push   %r11
+  // where %r11 is the scratch register, and %rbp the stack register.
+  const MCRegister StackReg = Inst.getOperand(0).getReg();
+  MCInst MovInst;
+  MovInst.setOpcode(X86::MOV32rr);
+  MovInst.addOperand(MCOperand::createReg(X86::R11D));
+  MovInst.addOperand(MCOperand::createReg(getReg32(StackReg)));
+  Out.emitInstruction(MovInst, STI);
+  MCInst PushInst(Inst);
+  PushInst.getOperand(0).setReg(X86::R11);
+  return Out.emitInstruction(PushInst, STI);
 }
 
 // Returns true if Inst is an X86 prefix
@@ -822,6 +883,8 @@ void X86::X86MCNaClExpander::doExpandInst(const MCInst &Inst,
   } else if (MCRegister StackReg = XCHGStackReg(Inst)) {
     // the above case doesnt catch xchg instruction, so special case
     expandExplicitStackManipulation(StackReg, Inst, Out, STI, EmitPrefixes);
+  } else if (Is64Bit && isStackRegPush(Inst)) {
+    expandStackRegPush(Inst, Out, STI);
   } else if (Is64Bit) {
     return expandLoadStore(Inst, Out, STI, EmitPrefixes);
   } else {
