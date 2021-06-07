@@ -14,7 +14,20 @@
 //X8664:    	pushq	%rax
 
 	push %rsp
-//X8664:    	pushq	%rsp
+//X8664:        movl %esp, %r11d
+//X8664-NEXT:   pushq %r11
+
+  push %rbp
+//X8664:        movl %ebp, %r11d
+//X8664-NEXT:   pushq %r11
+
+  pop %rbp
+//X8664:        popq %r11
+//X8664-NEXT:   .bundle_lock
+//X8664-NEXT:   movl %r11d, %ebp
+//X8664-NEXT:   addq %r15, %rbp
+//X8664-NEXT:   .bundle_unlock
+
 
 	push 12(%rsp)
 //X8664:    	pushq	12(%rsp)
