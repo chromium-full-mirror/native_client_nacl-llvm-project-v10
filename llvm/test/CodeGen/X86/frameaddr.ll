@@ -36,7 +36,9 @@ entry:
 ; CHECK-X32ABI-NEXT:  ret
 ; CHECK-NACL64-LABEL: test1
 ; CHECK-NACL64:       pushq %rbp
-; CHECK-NACL64-NEXT:  movq %rsp, %rbp
+; @LOCALMOD-START
+; CHECK-NACL64-NEXT:  movl %esp, %ebp
+; @LOCALMOD-END
 ; CHECK-NACL64-NEXT:  movl %ebp, %eax
   %0 = tail call i8* @llvm.frameaddress(i32 0)
   ret i8* %0
@@ -73,7 +75,9 @@ entry:
 ; CHECK-X32ABI-NEXT:  ret
 ; CHECK-NACL64-LABEL: test2
 ; CHECK-NACL64:       pushq %rbp
-; CHECK-NACL64-NEXT:  movq %rsp, %rbp
+; @LOCALMOD-START
+; CHECK-NACL64-NEXT:  movl %esp, %ebp
+; @LOCALMOD-END
 ; CHECK-NACL64-NEXT:  movl (%ebp), %eax
 ; CHECK-NACL64-NEXT:  movl (%eax), %eax
   %0 = tail call i8* @llvm.frameaddress(i32 2)
