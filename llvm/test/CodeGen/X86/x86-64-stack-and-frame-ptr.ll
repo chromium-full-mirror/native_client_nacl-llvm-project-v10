@@ -16,8 +16,8 @@
 ; X32ABI: popq %rbp
 ; NACL-LABEL: foo
 ; NACL: pushq %rbp
-; NACL: movq %rsp, %rbp
-; NACL: movl %edi, -4(%rbp)
+; NACL: movl %esp, %ebp
+; NACL: movl %edi, -4(%ebp)
 ; NACL: popq %rbp
 
 

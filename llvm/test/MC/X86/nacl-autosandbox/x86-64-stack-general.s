@@ -154,3 +154,9 @@
 //X8664-NEXT: 	xchgl	%ebp, %r11d
 //X8664-NEXT: 	leaq	(%rbp,%r15), %rbp
 //X8664-NEXT: 	.bundle_unlock
+
+  movl %esp, %ebp
+//X8664: movq %rsp, %rbp
+
+  movl %ebp, %esp
+//X8664: movq %rbp, %rsp
