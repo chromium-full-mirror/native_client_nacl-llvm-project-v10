@@ -53,6 +53,7 @@ X86FrameLowering::X86FrameLowering(const X86Subtarget &STI,
   IsLP64 = STI.isTarget64BitLP64();
   // standard x86_64 and NaCl use 64-bit frame/stack pointers, x32 - 32-bit.
   Uses64BitFramePtr = STI.isTarget64BitLP64() || STI.isTargetNaCl64();
+  if (STI.isTargetNaCl()) Uses64BitFramePtr = false; // @LOCALMOD
   StackPtr = TRI->getStackRegister();
 }
 
