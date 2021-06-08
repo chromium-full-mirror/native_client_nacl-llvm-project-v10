@@ -430,19 +430,21 @@ void X86::X86MCNaClExpander::emitSandboxMemOp(MCInst &Inst, int MemIdx,
     Base.setReg(getReg64(Base.getReg()));
     Index.setReg(getReg64(Index.getReg()));
   } else if (Index.getReg() == 0) {
-    clearHighBits(Base, Out, STI);
+    if (Base.getReg() != 0)
+      clearHighBits(Base, Out, STI);
     Index.setReg(getReg64(Base.getReg()));
     Base.setReg(X86::R15);
   } else {
     MCRegister Scratch32 = 0;
-    if (ScratchReg != 0) {
+    if (FlagUseX86CallConvention) {
+      Scratch32 = getReg32(X86::R11);
+    } else if (ScratchReg != 0) {
       Scratch32 = getReg32(ScratchReg);
     } else {
       Error(Inst,
           "Not enough scratch registers when emitting sandboxed memory operation."
       );
     }
-
     MCRegister Scratch64 = getReg64(Scratch32);
     MCRegister BaseReg64 = getReg64(Base.getReg());
     MCRegister IndexReg64 = getReg64(Index.getReg());
@@ -467,7 +469,12 @@ void X86::X86MCNaClExpander::emitSandboxMemOp(MCInst &Inst, int MemIdx,
     Base.setReg(X86::R15);
     Scale.setImm(1);
     Index.setReg(Scratch64);
-    Offset.setImm(0);
+    if (Offset.isImm()) {
+      Offset.setImm(0);
+    } else {
+      Inst.erase(Inst.begin() + MemIdx + 3);
+      Inst.insert(Inst.begin() + MemIdx + 3, MCOperand::createImm(0));
+    }
   }
 }
 
