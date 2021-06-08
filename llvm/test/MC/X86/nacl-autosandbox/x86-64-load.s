@@ -45,14 +45,14 @@
 
 	mov 131072(,%rax), %rax
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	leal	131072(%rax), %eax
-//X8664-NEXT: 	movq	(%r15,%rax), %rax
+//X8664-NEXT: 	leal	131072(%rax), %r11d
+//X8664-NEXT: 	movq	(%r15,%r11), %rax
 //X8664-NEXT: 	.bundle_unlock
 
 	mov 131072(%rax, %rdi, 8), %rax
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	leal	131072(%rax,%rdi,8), %eax
-//X8664-NEXT: 	movq	(%r15,%rax), %rax
+//X8664-NEXT: 	leal	131072(%rax,%rdi,8), %r11d
+//X8664-NEXT: 	movq	(%r15,%r11), %rax
 //X8664-NEXT: 	.bundle_unlock
 
 	movl 12(%rsp), %eax
@@ -99,14 +99,14 @@
 
 	movl 131072(,%rax), %eax
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	leal	131072(%rax), %eax
-//X8664-NEXT: 	movl	(%r15,%rax), %eax
+//X8664-NEXT: 	leal	131072(%rax), %r11d
+//X8664-NEXT: 	movl	(%r15,%r11), %eax
 //X8664-NEXT: 	.bundle_unlock
 
 	movl 131072(%rax, %rdi, 8), %eax
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	leal	131072(%rax,%rdi,8), %eax
-//X8664-NEXT: 	movl	(%r15,%rax), %eax
+//X8664-NEXT: 	leal	131072(%rax,%rdi,8), %r11d
+//X8664-NEXT: 	movl	(%r15,%r11), %eax
 //X8664-NEXT: 	.bundle_unlock
 
 	movw 12(%rsp), %ax
@@ -153,14 +153,14 @@
 
 	movw 131072(,%rax), %ax
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	leal	131072(%rax), %eax
-//X8664-NEXT: 	movw	(%r15,%rax), %ax
+//X8664-NEXT: 	leal	131072(%rax), %r11d
+//X8664-NEXT: 	movw	(%r15,%r11), %ax
 //X8664-NEXT: 	.bundle_unlock
 
 	movw 131072(%rax, %rdi, 8), %ax
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	leal	131072(%rax,%rdi,8), %eax
-//X8664-NEXT: 	movw	(%r15,%rax), %ax
+//X8664-NEXT: 	leal	131072(%rax,%rdi,8), %r11d
+//X8664-NEXT: 	movw	(%r15,%r11), %ax
 //X8664-NEXT: 	.bundle_unlock
 
 	movb 12(%rsp), %ah
@@ -202,16 +202,16 @@
 	movb 131072(,%rax), %ah
 //X8664:        rorq  $8, %rax
 //X8664-NEXT:   .bundle_lock
-//X8664-NEXT: 	leal	131072(%rax), %eax
-//X8664-NEXT: 	movb	(%r15,%rax), %al
+//X8664-NEXT: 	leal	131072(%rax), %r11d
+//X8664-NEXT: 	movb	(%r15,%r11), %al
 //X8664-NEXT: 	.bundle_unlock
 //X8664-NEXT:   rolq  $8, %rax
 
 	movb 131072(%rax, %rdi, 8), %ah
 //X8664:        rorq  $8, %rax
 //X8664-NEXT:   .bundle_lock
-//X8664-NEXT: 	leal	131072(%rax,%rdi,8), %eax
-//X8664-NEXT: 	movb	(%r15,%rax), %al
+//X8664-NEXT: 	leal	131072(%rax,%rdi,8), %r11d
+//X8664-NEXT: 	movb	(%r15,%r11), %al
 //X8664-NEXT: 	.bundle_unlock
 //X8664-NEXT:   rolq  $8, %rax
 
@@ -259,14 +259,14 @@
 
 	movb 131072(,%rax), %al
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	leal	131072(%rax), %eax
-//X8664-NEXT: 	movb	(%r15,%rax), %al
+//X8664-NEXT: 	leal	131072(%rax), %r11d
+//X8664-NEXT: 	movb	(%r15,%r11), %al
 //X8664-NEXT: 	.bundle_unlock
 
 	movb 131072(%rax, %rdi, 8), %al
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	leal	131072(%rax,%rdi,8), %eax
-//X8664-NEXT: 	movb	(%r15,%rax), %al
+//X8664-NEXT: 	leal	131072(%rax,%rdi,8), %r11d
+//X8664-NEXT: 	movb	(%r15,%r11), %al
 //X8664-NEXT: 	.bundle_unlock
 
 
@@ -323,3 +323,16 @@
 //X8664-NEXT: 	leal	131072(%rax,%rdi,8), %r11d
 //X8664-NEXT: 	prefetch	(%r15,%r11)
 //X8664-NEXT: 	.bundle_unlock
+
+  mov 2(,), %rax
+//X8664:        .bundle_lock
+//X8664-NEXT:   movq	2(%r15), %rax
+//X8664-NEXT:   .bundle_unlock
+
+  mov foo(%rax,%rbx), %rax
+//x8664:       .bundle_lock
+//x8664-NEXT:  leal	foo(%rax,%rbx), %r11d
+//x8664-NEXT:  movq	(%r15,%r11), %rax
+//x8664-NEXT:  .bundle_unlock
+
+foo:
