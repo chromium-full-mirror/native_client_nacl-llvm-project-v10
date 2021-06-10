@@ -75,6 +75,12 @@ ToolChain::ToolChain(const Driver &D, const llvm::Triple &T,
                      const ArgList &Args)
     : D(D), Triple(T), Args(Args), CachedRTTIArg(GetRTTIArgument(Args)),
       CachedRTTIMode(CalculateRTTIMode(Args, Triple, CachedRTTIArg)) {
+  // @LOCALMOD-START
+  std::string NaClCandidateLibPath = getArchSpecificLibPath();
+  if (getVFS().exists(NaClCandidateLibPath))
+    getLibraryPaths().push_back(NaClCandidateLibPath);
+  // @LOCALMOD-END
+
   std::string RuntimePath = getRuntimePath();
   if (getVFS().exists(RuntimePath))
     getLibraryPaths().push_back(RuntimePath);
@@ -499,6 +505,15 @@ std::string ToolChain::getStdlibPath() const {
 
 std::string ToolChain::getArchSpecificLibPath() const {
   SmallString<128> Path(getDriver().ResourceDir);
+
+  // @LOCALMOD-START
+  if (Triple.isOSNaCl() &&
+      llvm::Triple::getArchTypeName(getArch()) == "i386") {
+    llvm::sys::path::append(Path, "lib", "i686-nacl");
+    return std::string(Path.str());
+  }
+  // @LOCALMOD-END
+
   llvm::sys::path::append(Path, "lib", getOSLibName(),
                           llvm::Triple::getArchTypeName(getArch()));
   return std::string(Path.str());
