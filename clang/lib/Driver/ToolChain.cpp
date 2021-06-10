@@ -86,6 +86,10 @@ ToolChain::ToolChain(const Driver &D, const llvm::Triple &T,
       List.push_back(Path);
   };
 
+  // @LOCALMOD-START
+  addIfExists(getLibraryPaths(), getArchSpecificLibPath());
+  // @LOCALMOD-END
+
   if (std::optional<std::string> Path = getRuntimePath())
     getLibraryPaths().push_back(*Path);
   if (std::optional<std::string> Path = getStdlibPath())
@@ -785,6 +789,14 @@ ToolChain::path_list ToolChain::getArchSpecificLibPaths() const {
       llvm::sys::path::append(Path, S);
     Paths.push_back(std::string(Path.str()));
   };
+
+  // @LOCALMOD-START
+  if (Triple.isOSNaCl() &&
+      llvm::Triple::getArchTypeName(getArch()) == "i386") {
+    AddPath({"i686-nacl"});
+    return Paths;
+  }
+  // @LOCALMOD-END
 
   AddPath({getTriple().str()});
   AddPath({getOSLibName(), llvm::Triple::getArchTypeName(getArch())});
