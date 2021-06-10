@@ -80,6 +80,12 @@ ToolChain::ToolChain(const Driver &D, const llvm::Triple &T,
       getFilePaths().push_back(*CXXStdlibPath);
   }
 
+  // @LOCALMOD-START
+  std::string NaClCandidateLibPath = getArchSpecificLibPath();
+  if (getVFS().exists(NaClCandidateLibPath))
+    getLibraryPaths().push_back(NaClCandidateLibPath);
+  // @LOCALMOD-END
+
   if (auto RuntimePath = getRuntimePath())
     getLibraryPaths().push_back(*RuntimePath);
 
@@ -511,6 +517,15 @@ Optional<std::string> ToolChain::getCXXStdlibPath() const {
 
 std::string ToolChain::getArchSpecificLibPath() const {
   SmallString<128> Path(getDriver().ResourceDir);
+
+  // @LOCALMOD-START
+  if (Triple.isOSNaCl() &&
+      llvm::Triple::getArchTypeName(getArch()) == "i386") {
+    llvm::sys::path::append(Path, "lib", "i686-nacl");
+    return std::string(Path.str());
+  }
+  // @LOCALMOD-END
+
   llvm::sys::path::append(Path, "lib", getOSLibName(),
                           llvm::Triple::getArchTypeName(getArch()));
   return std::string(Path.str());
