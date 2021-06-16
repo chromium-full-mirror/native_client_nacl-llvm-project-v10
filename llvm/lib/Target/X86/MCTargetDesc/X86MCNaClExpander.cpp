@@ -416,65 +416,74 @@ void X86::X86MCNaClExpander::emitSandboxMemOp(MCInst &Inst, int MemIdx,
   MCOperand &Offset = Inst.getOperand(MemIdx + 3);
   MCOperand &Segment = Inst.getOperand(MemIdx + 4);
 
-
   // In the cases below, we want to promote any registers in the
   // memory operand to 64 bits.
   if (isAbsoluteReg(Base.getReg()) && Index.getReg() == 0) {
     Base.setReg(getReg64(Base.getReg()));
-  } else if (Base.getReg() == 0 && isAbsoluteReg(Index.getReg()) &&
+    return;
+  }
+
+  if (Base.getReg() == 0 && isAbsoluteReg(Index.getReg()) &&
              Scale.getImm() == 1) {
     Base.setReg(getReg64(Index.getReg()));
     Index.setReg(0);
-  } else if (isAbsoluteReg(Base.getReg()) && !isAbsoluteReg(Index.getReg())) {
+    return;
+  }
+
+  if (isAbsoluteReg(Base.getReg()) && !isAbsoluteReg(Index.getReg())) {
     clearHighBits(Index, Out, STI);
     Base.setReg(getReg64(Base.getReg()));
     Index.setReg(getReg64(Index.getReg()));
-  } else if (Index.getReg() == 0) {
+    return;
+  }
+
+  if (Index.getReg() == 0) {
     if (Base.getReg() != 0)
       clearHighBits(Base, Out, STI);
     Index.setReg(getReg64(Base.getReg()));
     Base.setReg(X86::R15);
+    return;
+  }
+
+  MCRegister Scratch32 = 0;
+  if (FlagUseX86CallConvention) {
+    Scratch32 = getReg32(X86::R11);
+  } else if (ScratchReg != 0) {
+    Scratch32 = getReg32(ScratchReg);
   } else {
-    MCRegister Scratch32 = 0;
-    if (FlagUseX86CallConvention) {
-      Scratch32 = getReg32(X86::R11);
-    } else if (ScratchReg != 0) {
-      Scratch32 = getReg32(ScratchReg);
-    } else {
-      Error(Inst,
-          "Not enough scratch registers when emitting sandboxed memory operation."
-      );
-    }
-    MCRegister Scratch64 = getReg64(Scratch32);
-    MCRegister BaseReg64 = getReg64(Base.getReg());
-    MCRegister IndexReg64 = getReg64(Index.getReg());
+    Error(Inst,
+        "Not enough scratch registers when emitting sandboxed memory operation."
+    );
+  }
+  MCRegister Scratch64 = getReg64(Scratch32);
+  MCRegister BaseReg64 = getReg64(Base.getReg());
+  MCRegister IndexReg64 = getReg64(Index.getReg());
 
-    MCInst Lea;
-    Lea.setOpcode(X86::LEA64_32r);
-    Lea.addOperand(MCOperand::createReg(Scratch32));
-    Lea.addOperand(MCOperand::createReg(BaseReg64));
-    Lea.addOperand(Scale);
-    Lea.addOperand(MCOperand::createReg(IndexReg64));
-    Lea.addOperand(Offset);
-    Lea.addOperand(Segment);
+  MCInst Lea;
+  Lea.setOpcode(X86::LEA64_32r);
+  Lea.addOperand(MCOperand::createReg(Scratch32));
+  Lea.addOperand(MCOperand::createReg(BaseReg64));
+  Lea.addOperand(Scale);
+  Lea.addOperand(MCOperand::createReg(IndexReg64));
+  Lea.addOperand(Offset);
+  Lea.addOperand(Segment);
 
-    // Specical case if there is no base or scale
-    if (Base.getReg() == 0 && Scale.getImm() == 1) {
-      Lea.getOperand(1).setReg(IndexReg64); // Base
-      Lea.getOperand(3).setReg(0);          // Index
-    }
+  // Specical case if there is no base or scale
+  if (Base.getReg() == 0 && Scale.getImm() == 1) {
+    Lea.getOperand(1).setReg(IndexReg64); // Base
+    Lea.getOperand(3).setReg(0);          // Index
+  }
 
-    Out.emitInstruction(Lea, STI);
+  Out.emitInstruction(Lea, STI);
 
-    Base.setReg(X86::R15);
-    Scale.setImm(1);
-    Index.setReg(Scratch64);
-    if (Offset.isImm()) {
-      Offset.setImm(0);
-    } else {
-      Inst.erase(Inst.begin() + MemIdx + 3);
-      Inst.insert(Inst.begin() + MemIdx + 3, MCOperand::createImm(0));
-    }
+  Base.setReg(X86::R15);
+  Scale.setImm(1);
+  Index.setReg(Scratch64);
+  if (Offset.isImm()) {
+    Offset.setImm(0);
+  } else {
+    Inst.erase(Inst.begin() + MemIdx + 3);
+    Inst.insert(Inst.begin() + MemIdx + 3, MCOperand::createImm(0));
   }
 }
 
