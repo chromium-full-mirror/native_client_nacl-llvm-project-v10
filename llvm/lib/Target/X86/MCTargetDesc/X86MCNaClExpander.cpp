@@ -430,38 +430,63 @@ void X86::X86MCNaClExpander::emitSandboxMemOp(MCInst &Inst, int MemIdx,
     return;
   }
 
-  if (isAbsoluteReg(Base.getReg()) && !isAbsoluteReg(Index.getReg())) {
-    clearHighBits(Index, Out, STI);
-    Base.setReg(getReg64(Base.getReg()));
-    Index.setReg(getReg64(Index.getReg()));
-    return;
-  }
-
-  if (Index.getReg() == 0) {
-    if (Base.getReg() != 0)
-      clearHighBits(Base, Out, STI);
-    Index.setReg(getReg64(Base.getReg()));
+  if (Index.getReg() == 0 && Base.getReg() == 0) {
     Base.setReg(X86::R15);
     return;
   }
 
-  MCRegister Scratch32 = 0;
+  MCRegister ScratchReg32 = 0;
   if (FlagUseX86CallConvention) {
-    Scratch32 = getReg32(X86::R11);
+    ScratchReg32 = X86::R11D;
   } else if (ScratchReg != 0) {
-    Scratch32 = getReg32(ScratchReg);
+    ScratchReg32 = getReg32(ScratchReg);
   } else {
     Error(Inst,
         "Not enough scratch registers when emitting sandboxed memory operation."
     );
   }
-  MCRegister Scratch64 = getReg64(Scratch32);
+
+  if (isAbsoluteReg(Base.getReg()) && !isAbsoluteReg(Index.getReg())) {
+    // Validation requires that for memory access, a 64-bit register is used,
+    // with its upper 32 bits clobbered by a 32-bit move just before.
+    // Move Index to 32 bit ScratchReg, and use ScratchReg32 instead of Index
+    // memory access.
+    MCInst MovIdxToScratchReg;
+    MovIdxToScratchReg.setOpcode(X86::MOV32rr);
+    MovIdxToScratchReg.addOperand(MCOperand::createReg(ScratchReg32));
+    MovIdxToScratchReg.addOperand(
+        MCOperand::createReg(getReg32(Index.getReg())));
+    Out.emitInstruction(MovIdxToScratchReg, STI);
+
+    Base.setReg(getReg64(Base.getReg()));
+    Index.setReg(getReg64(ScratchReg32));
+    return;
+  }
+
+  if (Index.getReg() == 0 && Base.getReg() != 0) {
+    // Validation requires that for memory access, a 64-bit register is used,
+    // with its upper 32 bits clobbered by a 32-bit move just before.
+    // Move Base to 32 bit ScratchReg, and use ScratchReg32 instead of Base for
+    // memory access.
+    MCInst MovBaseToScratchReg;
+    MovBaseToScratchReg.setOpcode(X86::MOV32rr);
+    MovBaseToScratchReg.addOperand(MCOperand::createReg(ScratchReg32));
+    MovBaseToScratchReg.addOperand(
+        MCOperand::createReg(getReg32(Base.getReg())));
+    Out.emitInstruction(MovBaseToScratchReg, STI);
+
+    Index.setReg(getReg64(ScratchReg32));
+    Base.setReg(X86::R15);
+    return;
+  }
+
+  MCRegister ScratchReg64 = getReg64(ScratchReg32);
   MCRegister BaseReg64 = getReg64(Base.getReg());
   MCRegister IndexReg64 = getReg64(Index.getReg());
 
   MCInst Lea;
   Lea.setOpcode(X86::LEA64_32r);
-  Lea.addOperand(MCOperand::createReg(Scratch32));
+  Lea.addOperand(MCOperand::createReg(ScratchReg32));
   Lea.addOperand(MCOperand::createReg(BaseReg64));
   Lea.addOperand(Scale);
   Lea.addOperand(MCOperand::createReg(IndexReg64));
@@ -478,7 +503,7 @@ void X86::X86MCNaClExpander::emitSandboxMemOp(MCInst &Inst, int MemIdx,
 
   Base.setReg(X86::R15);
   Scale.setImm(1);
-  Index.setReg(Scratch64);
+  Index.setReg(ScratchReg64);
   if (Offset.isImm()) {
     Offset.setImm(0);
   } else {
