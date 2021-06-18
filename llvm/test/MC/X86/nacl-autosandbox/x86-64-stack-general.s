@@ -131,9 +131,9 @@
 
 	xchg (%rax), %rsp
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%eax, %eax
+//X8664-NEXT: 	movl	%eax, %r11d
 //X8664-NEXT: 	.bundle_lock
-//X8664-NEXT: 	xchgl	%esp, (%r15,%rax)
+//X8664-NEXT: 	xchgl	%esp, (%r15,%r11)
 //X8664-NEXT: 	.bundle_unlock
 //X8664-NEXT: 	leaq	(%rsp,%r15), %rsp
 //X8664-NEXT: 	.bundle_unlock
@@ -141,9 +141,9 @@
 
 	xchg %rsp, (%rax)
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%eax, %eax
+//X8664-NEXT: 	movl	%eax, %r11d
 //X8664-NEXT: 	.bundle_lock
-//X8664-NEXT: 	xchgl	%esp, (%r15,%rax)
+//X8664-NEXT: 	xchgl	%esp, (%r15,%r11)
 //X8664-NEXT: 	.bundle_unlock
 //X8664-NEXT: 	leaq	(%rsp,%r15), %rsp
 //X8664-NEXT: 	.bundle_unlock

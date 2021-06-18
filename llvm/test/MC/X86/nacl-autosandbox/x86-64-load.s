@@ -21,26 +21,26 @@
 
 	mov 131072(%rsp, %rdi, 8), %rax
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%edi, %edi
-//X8664-NEXT: 	movq	131072(%rsp,%rdi,8), %rax
+//X8664-NEXT: 	movl	%edi, %r11d
+//X8664-NEXT: 	movq	131072(%rsp,%r11,8), %rax
 //X8664-NEXT: 	.bundle_unlock
 
 	mov 131072(%rbp, %rdi, 8), %rax
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%edi, %edi
-//X8664-NEXT: 	movq	131072(%rbp,%rdi,8), %rax
+//X8664-NEXT: 	movl	%edi, %r11d
+//X8664-NEXT: 	movq	131072(%rbp,%r11,8), %rax
 //X8664-NEXT: 	.bundle_unlock
 
 	mov 131072(%r15, %rdi, 8), %rax
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%edi, %edi
-//X8664-NEXT: 	movq	131072(%r15,%rdi,8), %rax
+//X8664-NEXT: 	movl	%edi, %r11d
+//X8664-NEXT: 	movq	131072(%r15,%r11,8), %rax
 //X8664-NEXT: 	.bundle_unlock
 
 	mov 131072(%rax), %rax
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%eax, %eax
-//X8664-NEXT: 	movq	131072(%r15,%rax), %rax
+//X8664-NEXT: 	movl	%eax, %r11d
+//X8664-NEXT: 	movq	131072(%r15,%r11), %rax
 //X8664-NEXT: 	.bundle_unlock
 
 	mov 131072(,%rax), %rax
@@ -75,26 +75,26 @@
 
 	movl 131072(%rsp, %rdi, 8), %eax
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%edi, %edi
-//X8664-NEXT: 	movl	131072(%rsp,%rdi,8), %eax
+//X8664-NEXT: 	movl	%edi, %r11d
+//X8664-NEXT: 	movl	131072(%rsp,%r11,8), %eax
 //X8664-NEXT: 	.bundle_unlock
 
 	movl 131072(%rbp, %rdi, 8), %eax
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%edi, %edi
-//X8664-NEXT: 	movl	131072(%rbp,%rdi,8), %eax
+//X8664-NEXT: 	movl	%edi, %r11d
+//X8664-NEXT: 	movl	131072(%rbp,%r11,8), %eax
 //X8664-NEXT: 	.bundle_unlock
 
 	movl 131072(%r15, %rdi, 8), %eax
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%edi, %edi
-//X8664-NEXT: 	movl	131072(%r15,%rdi,8), %eax
+//X8664-NEXT: 	movl	%edi, %r11d
+//X8664-NEXT: 	movl	131072(%r15,%r11,8), %eax
 //X8664-NEXT: 	.bundle_unlock
 
 	movl 131072(%rax), %eax
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%eax, %eax
-//X8664-NEXT: 	movl	131072(%r15,%rax), %eax
+//X8664-NEXT: 	movl	%eax, %r11d
+//X8664-NEXT: 	movl	131072(%r15,%r11), %eax
 //X8664-NEXT: 	.bundle_unlock
 
 	movl 131072(,%rax), %eax
@@ -129,26 +129,26 @@
 
 	movw 131072(%rsp, %rdi, 8), %ax
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%edi, %edi
-//X8664-NEXT: 	movw	131072(%rsp,%rdi,8), %ax
+//X8664-NEXT: 	movl	%edi, %r11d
+//X8664-NEXT: 	movw	131072(%rsp,%r11,8), %ax
 //X8664-NEXT: 	.bundle_unlock
 
 	movw 131072(%rbp, %rdi, 8), %ax
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%edi, %edi
-//X8664-NEXT: 	movw	131072(%rbp,%rdi,8), %ax
+//X8664-NEXT: 	movl	%edi, %r11d
+//X8664-NEXT: 	movw	131072(%rbp,%r11,8), %ax
 //X8664-NEXT: 	.bundle_unlock
 
 	movw 131072(%r15, %rdi, 8), %ax
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%edi, %edi
-//X8664-NEXT: 	movw	131072(%r15,%rdi,8), %ax
+//X8664-NEXT: 	movl	%edi, %r11d
+//X8664-NEXT: 	movw	131072(%r15,%r11,8), %ax
 //X8664-NEXT: 	.bundle_unlock
 
 	movw 131072(%rax), %ax
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%eax, %eax
-//X8664-NEXT: 	movw	131072(%r15,%rax), %ax
+//X8664-NEXT: 	movl	%eax, %r11d
+//X8664-NEXT: 	movw	131072(%r15,%r11), %ax
 //X8664-NEXT: 	.bundle_unlock
 
 	movw 131072(,%rax), %ax
@@ -178,24 +178,24 @@
 	movb 131072(%rsp, %rdi, 8), %ah
 //X8664:        rorq  $8, %rax
 //X8664-NEXT:   .bundle_lock
-//X8664-NEXT: 	movl	%edi, %edi
-//X8664-NEXT: 	movb	131072(%rsp,%rdi,8), %al
+//X8664-NEXT: 	movl	%edi, %r11d
+//X8664-NEXT: 	movb	131072(%rsp,%r11,8), %al
 //X8664-NEXT: 	.bundle_unlock
 //X8664-NEXT:   rolq  $8, %rax
 
 	movb 131072(%rbp, %rdi, 8), %ah
 //X8664:        rorq  $8, %rax
 //X8664-NEXT:   .bundle_lock
-//X8664-NEXT: 	movl	%edi, %edi
-//X8664-NEXT: 	movb	131072(%rbp,%rdi,8), %al
+//X8664-NEXT: 	movl	%edi, %r11d
+//X8664-NEXT: 	movb	131072(%rbp,%r11,8), %al
 //X8664-NEXT: 	.bundle_unlock
 //X8664-NEXT:   rolq  $8, %rax
 
 	movb 131072(%rax), %ah
 //X8664:        rorq  $8, %rax
 //X8664-NEXT:   .bundle_lock
-//X8664-NEXT: 	movl	%eax, %eax
-//X8664-NEXT: 	movb	131072(%r15,%rax), %al
+//X8664-NEXT: 	movl	%eax, %r11d
+//X8664-NEXT: 	movb	131072(%r15,%r11), %al
 //X8664-NEXT: 	.bundle_unlock
 //X8664-NEXT:   rolq  $8, %rax
 
@@ -235,26 +235,26 @@
 
 	movb 131072(%rsp, %rdi, 8), %al
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%edi, %edi
-//X8664-NEXT: 	movb	131072(%rsp,%rdi,8), %al
+//X8664-NEXT: 	movl	%edi, %r11d
+//X8664-NEXT: 	movb	131072(%rsp,%r11,8), %al
 //X8664-NEXT: 	.bundle_unlock
 
 	movb 131072(%rbp, %rdi, 8), %al
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%edi, %edi
-//X8664-NEXT: 	movb	131072(%rbp,%rdi,8), %al
+//X8664-NEXT: 	movl	%edi, %r11d
+//X8664-NEXT: 	movb	131072(%rbp,%r11,8), %al
 //X8664-NEXT: 	.bundle_unlock
 
 	movb 131072(%r15, %rdi, 8), %al
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%edi, %edi
-//X8664-NEXT: 	movb	131072(%r15,%rdi,8), %al
+//X8664-NEXT: 	movl	%edi, %r11d
+//X8664-NEXT: 	movb	131072(%r15,%r11,8), %al
 //X8664-NEXT: 	.bundle_unlock
 
 	movb 131072(%rax), %al
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%eax, %eax
-//X8664-NEXT: 	movb	131072(%r15,%rax), %al
+//X8664-NEXT: 	movl	%eax, %r11d
+//X8664-NEXT: 	movb	131072(%r15,%r11), %al
 //X8664-NEXT: 	.bundle_unlock
 
 	movb 131072(,%rax), %al
@@ -290,26 +290,26 @@
 
 	prefetch 131072(%rsp, %rdi, 8)
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%edi, %edi
-//X8664-NEXT: 	prefetch	131072(%rsp,%rdi,8)
+//X8664-NEXT: 	movl	%edi, %r11d
+//X8664-NEXT: 	prefetch	131072(%rsp,%r11,8)
 //X8664-NEXT: 	.bundle_unlock
 
 	prefetch 131072(%rbp, %rdi, 8)
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%edi, %edi
-//X8664-NEXT: 	prefetch	131072(%rbp,%rdi,8)
+//X8664-NEXT: 	movl	%edi, %r11d
+//X8664-NEXT: 	prefetch	131072(%rbp,%r11,8)
 //X8664-NEXT: 	.bundle_unlock
 
 	prefetch 131072(%r15, %rdi, 8)
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%edi, %edi
-//X8664-NEXT: 	prefetch	131072(%r15,%rdi,8)
+//X8664-NEXT: 	movl	%edi, %r11d
+//X8664-NEXT: 	prefetch	131072(%r15,%r11,8)
 //X8664-NEXT: 	.bundle_unlock
 
 	prefetch 131072(%rax)
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%eax, %eax
-//X8664-NEXT: 	prefetch	131072(%r15,%rax)
+//X8664-NEXT: 	movl	%eax, %r11d
+//X8664-NEXT: 	prefetch	131072(%r15,%r11)
 //X8664-NEXT: 	.bundle_unlock
 
 	prefetch 131072(,%rax)
