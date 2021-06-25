@@ -5,20 +5,20 @@
 	cmpsl (%edi), (%esi)
 //X8632:    	cmpsl	%es:(%edi), (%esi)
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%edi, %edi
-//X8664-NEXT: 	leaq	(%r15,%rdi), %rdi
 //X8664-NEXT: 	movl	%esi, %esi
 //X8664-NEXT: 	leaq	(%r15,%rsi), %rsi
+//X8664-NEXT: 	movl	%edi, %edi
+//X8664-NEXT: 	leaq	(%r15,%rdi), %rdi
 //X8664-NEXT: 	cmpsl	%es:(%edi), (%esi)
 //X8664-NEXT: 	.bundle_unlock
 
 	movsl (%esi), (%edi)
 //X8632:    	movsl	(%esi), %es:(%edi)
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%edi, %edi
-//X8664-NEXT: 	leaq	(%r15,%rdi), %rdi
 //X8664-NEXT: 	movl	%esi, %esi
 //X8664-NEXT: 	leaq	(%r15,%rsi), %rsi
+//X8664-NEXT: 	movl	%edi, %edi
+//X8664-NEXT: 	leaq	(%r15,%rdi), %rdi
 //X8664-NEXT: 	movsl	(%esi), %es:(%edi)
 //X8664-NEXT: 	.bundle_unlock
 
@@ -34,20 +34,20 @@
 	rep cmpsl (%edi), (%esi)
 //X8632:    	 rep cmpsl   %es:(%edi), (%esi)
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%edi, %edi
-//X8664-NEXT: 	leaq	(%r15,%rdi), %rdi
 //X8664-NEXT: 	movl	%esi, %esi
 //X8664-NEXT: 	leaq	(%r15,%rsi), %rsi
+//X8664-NEXT: 	movl	%edi, %edi
+//X8664-NEXT: 	leaq	(%r15,%rdi), %rdi
 //X8664-NEXT: 	rep cmpsl	%es:(%edi), (%esi)
 //X8664-NEXT: 	.bundle_unlock
 
 	rep movsl (%esi), (%edi)
 //X8632:    	rep movsl	(%esi), %es:(%edi)
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%edi, %edi
-//X8664-NEXT: 	leaq	(%r15,%rdi), %rdi
 //X8664-NEXT: 	movl	%esi, %esi
 //X8664-NEXT: 	leaq	(%r15,%rsi), %rsi
+//X8664-NEXT: 	movl	%edi, %edi
+//X8664-NEXT: 	leaq	(%r15,%rdi), %rdi
 //X8664-NEXT: 	rep movsl	(%esi), %es:(%edi)
 //X8664-NEXT: 	.bundle_unlock
 
