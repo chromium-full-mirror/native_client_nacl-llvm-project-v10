@@ -704,8 +704,8 @@ void X86::X86MCNaClExpander::expandStringOperation(
   case X86::MOVSW:
   case X86::MOVSL:
   case X86::MOVSQ:
-    fixupStringOpReg(Inst.getOperand(0), Out, STI);
     fixupStringOpReg(Inst.getOperand(1), Out, STI);
+    fixupStringOpReg(Inst.getOperand(0), Out, STI);
     break;
   case X86::STOSB:
   case X86::STOSW:
