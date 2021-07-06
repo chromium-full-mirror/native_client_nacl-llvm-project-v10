@@ -1616,6 +1616,14 @@ bool X86DAGToDAGISel::foldOffsetIntoAddress(uint64_t Offset,
 
 bool X86DAGToDAGISel::matchLoadInAddress(LoadSDNode *N, X86ISelAddressMode &AM,
                                          bool AllowSegmentRegForX32) {
+  // @LOCALMOD-START
+  // Disable this tls access optimization in Native Client, since
+  // gs:0 (or fs:0 on X86-64) does not exactly contain its own address.
+  if (Subtarget->isTargetNaCl()) {
+    return true;
+  }
+  // @LOCALMOD-END
+
   SDValue Address = N->getOperand(1);
 
   // load gs:0 -> GS segment register.
