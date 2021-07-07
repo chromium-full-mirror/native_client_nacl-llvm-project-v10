@@ -60,7 +60,7 @@ private:
                                const MCSubtargetInfo &STI);
 
   void expandPrefetch(const MCInst &Inst, MCStreamer &Out,
-		      const MCSubtargetInfo &STI);
+                      const MCSubtargetInfo &STI);
 
   void expandLoadStore(const MCInst &Inst, MCStreamer &Out,
                        const MCSubtargetInfo &STI);
@@ -68,6 +68,6 @@ private:
   void doExpandInst(const MCInst &Inst, MCStreamer &Out,
                     const MCSubtargetInfo &STI);
 };
-}
-}
+} // namespace ARM
+} // namespace llvm
 #endif
