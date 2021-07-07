@@ -238,8 +238,8 @@ static void sandboxBaseDisp(const MCInst &Inst, const MCInstrInfo &II,
 
 // Create an ADD instruction which computes the base + reg [+ scale]
 // addressing mode in base LDR/STR instructions into the register Target.
-static MCInst getAddrInstr(const MCInst &Inst, const MCInstrInfo &II, int MemIdx,
-                           MCRegister Target) {
+static MCInst getAddrInstr(const MCInst &Inst, const MCInstrInfo &II,
+                           int MemIdx, MCRegister Target) {
   assert(Inst.getOperand(MemIdx).isReg());
 
   unsigned AM2Opc = Inst.getOperand(MemIdx + 2).getImm();
@@ -319,11 +319,11 @@ static void sandboxBaseRegScale(const MCInst &Inst, const MCInstrInfo &II,
   }
 }
 
-
 void ARM::ARMMCNaClExpander::expandPrefetch(const MCInst &Inst, MCStreamer &Out,
                                             const MCSubtargetInfo &STI) {
   if (Inst.getOpcode() == ARM::PLDi12) {
-    return sandboxBaseDisp(Inst, *InstInfo, Inst.getOperand(0).getReg(), Out, STI);
+    return sandboxBaseDisp(Inst, *InstInfo, Inst.getOperand(0).getReg(), Out,
+                           STI);
   } else if (Inst.getOpcode() == ARM::PLDrs) {
     if (numScratchRegs() == 0)
       Error(Inst, "Not enough scratch registers provided");
@@ -348,7 +348,6 @@ void ARM::ARMMCNaClExpander::expandPrefetch(const MCInst &Inst, MCStreamer &Out,
     Out.emitInstruction(Inst, STI);
   }
 }
-
 
 void ARM::ARMMCNaClExpander::expandLoadStore(const MCInst &Inst,
                                              MCStreamer &Out,
@@ -435,10 +434,10 @@ void ARM::ARMMCNaClExpander::expandLoadStore(const MCInst &Inst,
     return sandboxBaseRegScale(Inst, *InstInfo, PostIncrement, 0, MemIdx,
                                getScratchReg(0), Out, STI);
   default:
-    // Fall back case, should handle all other instructions that load/store memory
-    // such as VFP/NEON loads/stores and prefetch instructions.
-    return sandboxBaseDisp(Inst, *InstInfo, Inst.getOperand(MemIdx).getReg(), Out,
-                           STI);
+    // Fall back case, should handle all other instructions that load/store
+    // memory such as VFP/NEON loads/stores and prefetch instructions.
+    return sandboxBaseDisp(Inst, *InstInfo, Inst.getOperand(MemIdx).getReg(),
+                           Out, STI);
   }
 }
 
