@@ -38,6 +38,7 @@
 #include "llvm/MC/MCELFStreamer.h"
 #include "llvm/MC/MCInst.h"
 #include "llvm/MC/MCInstBuilder.h"
+#include "llvm/MC/MCNaCl.h" // @LOCALMOD
 #include "llvm/MC/MCObjectStreamer.h"
 #include "llvm/MC/MCStreamer.h"
 #include "llvm/MC/MCSymbol.h"
@@ -489,6 +490,11 @@ void ARMAsmPrinter::emitStartOfAsmFile(Module &M) {
   // Emit ARM Build Attributes
   if (TT.isOSBinFormatELF())
     emitAttributes();
+
+  // @LOCALMOD-BEGIN
+  if (TT.isOSNaCl())
+    initializeNaClMCStreamer(*OutStreamer.get(), OutContext, TT);
+  // @LOCALMOD-END
 
   // Use the triple's architecture and subarchitecture to determine
   // if we're thumb for the purposes of the top level code16 assembler
