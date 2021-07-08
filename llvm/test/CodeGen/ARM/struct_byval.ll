@@ -1,6 +1,6 @@
 ; RUN: llc < %s -mtriple=armv7-apple-ios6.0 | FileCheck %s
 ; RUN: llc < %s -mtriple=thumbv7-apple-ios6.0 | FileCheck %s
-; RUN: llc < %s -mtriple=armv7-unknown-nacl-gnueabi | FileCheck %s -check-prefix=NACL
+; RUN: llc < %s -mtriple=armv7-unknown-nacl-gnueabi -nacl-enable-autosandboxing=false | FileCheck %s -check-prefix=NACL
 ; RUN: llc < %s -mtriple=armv5-none-linux-gnueabi | FileCheck %s -check-prefix=NOMOVT
 
 ; NOMOVT-NOT: movt
