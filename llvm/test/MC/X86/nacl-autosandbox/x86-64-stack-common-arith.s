@@ -115,18 +115,18 @@
 
 	lea 12(%rsp, %rax), %rsp
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%eax, %r11d
+//X8664-NEXT: 	leal	12(%rsp,%rax), %r11d
 //X8664-NEXT: 	.bundle_lock
-//X8664-NEXT: 	leal	12(%rsp,%r11), %esp
+//X8664-NEXT: 	leal	(%r15,%r11), %esp
 //X8664-NEXT: 	.bundle_unlock
 //X8664-NEXT: 	leaq	(%rsp,%r15), %rsp
 //X8664-NEXT: 	.bundle_unlock
 
 	lea 12(%rsp, %rax), %rbp
 //X8664:    	.bundle_lock
-//X8664-NEXT: 	movl	%eax, %r11d
+//X8664-NEXT: 	leal	12(%rsp,%rax), %r11d
 //X8664-NEXT: 	.bundle_lock
-//X8664-NEXT: 	leal	12(%rsp,%r11), %ebp
+//X8664-NEXT: 	leal	(%r15,%r11), %ebp
 //X8664-NEXT: 	.bundle_unlock
 //X8664-NEXT: 	leaq	(%rbp,%r15), %rbp
 //X8664-NEXT: 	.bundle_unlock
