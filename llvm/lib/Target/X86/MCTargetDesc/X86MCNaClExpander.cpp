@@ -446,7 +446,8 @@ void X86::X86MCNaClExpander::emitSandboxMemOp(MCInst &Inst, int MemIdx,
     );
   }
 
-  if (isAbsoluteReg(Base.getReg()) && !isAbsoluteReg(Index.getReg())) {
+  if (isAbsoluteReg(Base.getReg()) && !isAbsoluteReg(Index.getReg()) &&
+      Offset.isImm() && Offset.getImm() == 0) {
     // Validation requires that for memory access, a 64-bit register is used,
     // with its upper 32 bits clobbered by a 32-bit move just before.
     // Move Index to 32 bit ScratchReg, and use ScratchReg32 instead of Index
@@ -463,7 +464,8 @@ void X86::X86MCNaClExpander::emitSandboxMemOp(MCInst &Inst, int MemIdx,
     return;
   }
 
-  if (Index.getReg() == 0 && Base.getReg() != 0) {
+  if (Index.getReg() == 0 && Base.getReg() != 0 && Offset.isImm() &&
+      Offset.getImm() == 0) {
     // Validation requires that for memory access, a 64-bit register is used,
     // with its upper 32 bits clobbered by a 32-bit move just before.
     // Move Base to 32 bit ScratchReg, and use ScratchReg32 instead of Base for
