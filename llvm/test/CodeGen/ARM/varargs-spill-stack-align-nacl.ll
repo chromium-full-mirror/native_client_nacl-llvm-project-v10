@@ -1,4 +1,4 @@
-; RUN: llc < %s -mtriple=arm-nacl-gnueabi | FileCheck %s
+; RUN: llc < %s -mtriple=arm-nacl-gnueabi -nacl-enable-autosandboxing=false | FileCheck %s
 
 declare void @llvm.va_start(ptr)
 declare void @external_func(ptr)
