@@ -19207,7 +19207,8 @@ X86TargetLowering::LowerGlobalAddress(SDValue Op, SelectionDAG &DAG) const {
 static SDValue
 GetTLSADDR(SelectionDAG &DAG, SDValue Chain, GlobalAddressSDNode *GA,
            SDValue *InFlag, const EVT PtrVT, unsigned ReturnReg,
-           unsigned char OperandFlags, bool LocalDynamic = false) {
+           unsigned char OperandFlags, bool LocalDynamic = false,
+           unsigned Opcode = ISD::DELETED_NODE) { // @LOCALMOD
   MachineFrameInfo &MFI = DAG.getMachineFunction().getFrameInfo();
   SDVTList NodeTys = DAG.getVTList(MVT::Other, MVT::Glue);
   SDLoc dl(GA);
@@ -19216,8 +19217,16 @@ GetTLSADDR(SelectionDAG &DAG, SDValue Chain, GlobalAddressSDNode *GA,
                                            GA->getOffset(),
                                            OperandFlags);
 
-  X86ISD::NodeType CallType = LocalDynamic ? X86ISD::TLSBASEADDR
-                                           : X86ISD::TLSADDR;
+
+  // @LOCALMOD - changed type for casting
+  unsigned CallType = LocalDynamic ? X86ISD::TLSBASEADDR
+                                   : X86ISD::TLSADDR;
+
+  // @LOCALMOD-START
+  // If Opcode was explicitly overridden, use it as the call type.
+  if (Opcode != ISD::DELETED_NODE)
+    CallType = Opcode;
+  // @LOCALMOD-END
 
   if (InFlag) {
     SDValue Ops[] = { Chain,  TGA, *InFlag };
@@ -19234,6 +19243,31 @@ GetTLSADDR(SelectionDAG &DAG, SDValue Chain, GlobalAddressSDNode *GA,
   SDValue Flag = Chain.getValue(1);
   return DAG.getCopyFromReg(Chain, dl, ReturnReg, PtrVT, Flag);
 }
+
+// @LOCALMOD-START
+// Lower ISD::GlobalTLSAddress using the "initial exec" or "local exec" model.
+// Lower TLS accesses to a function call, rather than use segment registers.
+static SDValue
+LowerToTLSExecCall(GlobalAddressSDNode *GA, SelectionDAG &DAG,
+                   const EVT PtrVT, TLSModel::Model model, bool is64Bit) {
+  // See: http://code.google.com/p/nativeclient/issues/detail?id=1685
+  unsigned char TargetFlag;
+  unsigned Opcode;
+  if (model == TLSModel::LocalExec) {
+    TargetFlag = is64Bit ? X86II::MO_TPOFF : X86II::MO_NTPOFF;
+    Opcode = X86ISD::TLSADDR_LE;
+  } else if (model == TLSModel::InitialExec) {
+    TargetFlag = is64Bit ? X86II::MO_GOTTPOFF : X86II::MO_INDNTPOFF;
+    Opcode = X86ISD::TLSADDR_IE;
+  } else {
+    llvm_unreachable("Unknown TLS model");
+  }
+
+  return GetTLSADDR(DAG, DAG.getEntryNode(), GA, NULL, PtrVT,
+                    X86::EAX, // PtrVT is 32-bit.
+                    TargetFlag, false, Opcode);
+}
+// @LOCALMOD-END
 
 // Lower ISD::GlobalTLSAddress using the "general dynamic" model, 32 bit
 static SDValue
@@ -19373,6 +19407,10 @@ X86TargetLowering::LowerGlobalTLSAddress(SDValue Op, SelectionDAG &DAG) const {
 
   if (Subtarget.isTargetELF()) {
     TLSModel::Model model = DAG.getTarget().getTLSModel(GV);
+    // @LOCALMOD-START
+    if (Subtarget.isTargetNaCl64())
+      return LowerToTLSExecCall(GA, DAG, PtrVT, model, true);
+    // @LOCALMOD-END
     switch (model) {
       case TLSModel::GeneralDynamic:
         if (Subtarget.is64Bit()) {

@@ -289,6 +289,14 @@ namespace llvm {
     // of the TLS block for the current module.
     TLSBASEADDR,
 
+    // @LOCALMOD-BEGIN
+    // TLSADDR_LE - Thread Local Storage. (Local Exec Model)
+    TLSADDR_LE,
+
+    // TLSADDR_IE - Thread Local Storage. (Initial Exec Model)
+    TLSADDR_IE,
+    // @LOCALMOD-END
+
     // Thread Local Storage.  When calling to an OS provided
     // thunk at the address from an earlier relocation.
     TLSCALL,

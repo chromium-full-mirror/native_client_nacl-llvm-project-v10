@@ -62,6 +62,7 @@ set(sources
   X86MCInstLower.cpp
   X86MachineFunctionInfo.cpp
   X86MacroFusion.cpp
+  X86NaClRewritePass.cpp
   X86OptimizeLEAs.cpp
   X86PadShortFunction.cpp
   X86PartialReduction.cpp
