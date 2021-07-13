@@ -41,6 +41,11 @@ include "X86InstrUtils.td"
 // Subsystems.
 //===----------------------------------------------------------------------===//
 
+//===----------------------------------------------------------------------===//
+// NaCl support (@LOCALMOD)
+//===----------------------------------------------------------------------===//
+include "X86InstrNaCl.td"
+
 include "X86InstrMisc.td"
 include "X86InstrTBM.td"
 include "X86InstrArithmetic.td"
