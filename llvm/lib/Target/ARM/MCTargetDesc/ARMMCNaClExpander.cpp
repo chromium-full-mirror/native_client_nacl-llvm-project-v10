@@ -443,56 +443,28 @@ void ARM::ARMMCNaClExpander::expandLoadStore(const MCInst &Inst,
 
 void ARM::ARMMCNaClExpander::doExpandInst(const MCInst &Inst, MCStreamer &Out,
                                           const MCSubtargetInfo &STI) {
+  if (isReturn(Inst))
+    return expandReturn(Inst, Out, STI);
 
-  // This logic is to remain compatible with the existing pseudo instruction
-  // expansion code in ARMMCNaCl.cpp
-  if (SaveCount == 0) {
-    switch (Inst.getOpcode()) {
-    case ARM::SFI_NOP_IF_AT_BUNDLE_END:
-      SaveCount = 3;
-      break;
-    case ARM::SFI_DATA_MASK:
-      llvm_unreachable(
-          "SFI_DATA_MASK found without preceding SFI_NOP_IF_AT_BUNDLE_END");
-      break;
-    case ARM::SFI_GUARD_CALL:
-    case ARM::SFI_GUARD_INDIRECT_CALL:
-    case ARM::SFI_GUARD_INDIRECT_JMP:
-    case ARM::SFI_GUARD_RETURN:
-    case ARM::SFI_GUARD_LOADSTORE:
-    case ARM::SFI_GUARD_LOADSTORE_TST:
-      SaveCount = 2;
-      break;
-    case ARM::SFI_GUARD_SP_LOAD:
-      SaveCount = 4;
-      break;
-    default:
-      break;
-    }
-  }
+  if (isIndirectBranch(Inst))
+    return expandIndirectBranch(Inst, Out, STI, false);
 
-  if (SaveCount == 0) {
-    if (isReturn(Inst)) {
-      return expandReturn(Inst, Out, STI);
-    } else if (isIndirectBranch(Inst)) {
-      return expandIndirectBranch(Inst, Out, STI, false);
-    } else if (isCall(Inst)) {
-      return expandCall(Inst, Out, STI);
-    } else if (isBranch(Inst)) {
-      return Out.emitInstruction(Inst, STI);
-    } else if (mayAffectControlFlow(Inst)) {
-      return expandControlFlow(Inst, Out, STI);
-    } else if (mayModifyStack(Inst)) {
-      return expandStackManipulation(Inst, Out, STI);
-    } else if (mayLoad(Inst) || mayStore(Inst)) {
-      return expandLoadStore(Inst, Out, STI);
-    } else {
-      return Out.emitInstruction(Inst, STI);
-    }
-  } else {
-    SaveCount--;
-    Out.emitInstruction(Inst, STI);
-  }
+  if (isCall(Inst))
+    return expandCall(Inst, Out, STI);
+
+  if (isBranch(Inst))
+    return Out.emitInstruction(Inst, STI);
+
+  if (mayAffectControlFlow(Inst))
+    return expandControlFlow(Inst, Out, STI);
+
+  if (mayModifyStack(Inst))
+    return expandStackManipulation(Inst, Out, STI);
+
+  if (mayLoad(Inst) || mayStore(Inst))
+    return expandLoadStore(Inst, Out, STI);
+
+  return Out.emitInstruction(Inst, STI);
 }
 
 bool ARM::ARMMCNaClExpander::expandInst(const MCInst &Inst, MCStreamer &Out,
