@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file describes the X86 properties of the instructions which are needed 
+// This file describes the X86 properties of the instructions which are needed
 // for code generation, machine code emission, and analysis.
 //
 //===----------------------------------------------------------------------===//
@@ -234,6 +234,14 @@ def X86tlsaddr : SDNode<"X86ISD::TLSADDR", SDT_X86TLSADDR,
 
 def X86tlsbaseaddr : SDNode<"X86ISD::TLSBASEADDR", SDT_X86TLSBASEADDR,
                         [SDNPHasChain, SDNPOptInGlue, SDNPOutGlue]>;
+
+// @LOCALMOD-BEGIN
+def X86tlsaddr_le : SDNode<"X86ISD::TLSADDR_LE", SDT_X86TLSADDR,
+                           [SDNPHasChain, SDNPOptInGlue, SDNPOutGlue]>;
+
+def X86tlsaddr_ie : SDNode<"X86ISD::TLSADDR_IE", SDT_X86TLSADDR,
+                           [SDNPHasChain, SDNPOptInGlue, SDNPOutGlue]>;
+// @LOCALMOD-END
 
 def X86ehret : SDNode<"X86ISD::EH_RETURN", SDT_X86EHRET,
                         [SDNPHasChain]>;
@@ -1308,7 +1316,7 @@ def trunc_su : unop_oneuse<trunc>;
 class X86TypeInfo<ValueType vt, string instrsuffix, RegisterClass regclass,
                   PatFrag loadnode, X86MemOperand memoperand, ImmType immkind,
                   Operand immoperand, SDPatternOperator immoperator,
-                  SDPatternOperator immnosuoperator, Operand imm8operand, 
+                  SDPatternOperator immnosuoperator, Operand imm8operand,
                   SDPatternOperator imm8operator, SDPatternOperator imm8nosuoperator,
                   bit hasOddOpcode, OperandSize opSize,
                   bit hasREX_W> {
@@ -1377,21 +1385,26 @@ class X86TypeInfo<ValueType vt, string instrsuffix, RegisterClass regclass,
 
 def invalid_node : SDNode<"<<invalid_node>>", SDTIntLeaf,[],"<<invalid_node>>">;
 
-def Xi8  : X86TypeInfo<i8, "b", GR8, loadi8, i8mem, Imm8, i8imm, 
+def Xi8  : X86TypeInfo<i8, "b", GR8, loadi8, i8mem, Imm8, i8imm,
                        imm_su, imm, i8imm, invalid_node, invalid_node,
                        0, OpSizeFixed, 0>;
-def Xi16 : X86TypeInfo<i16, "w", GR16, loadi16, i16mem, Imm16, i16imm, 
+def Xi16 : X86TypeInfo<i16, "w", GR16, loadi16, i16mem, Imm16, i16imm,
                        imm_su, imm, i16i8imm, i16immSExt8_su, i16immSExt8,
                        1, OpSize16, 0>;
-def Xi32 : X86TypeInfo<i32, "l", GR32, loadi32, i32mem, Imm32, i32imm, 
+def Xi32 : X86TypeInfo<i32, "l", GR32, loadi32, i32mem, Imm32, i32imm,
                        imm_su, imm, i32i8imm, i32immSExt8_su, i32immSExt8,
                        1, OpSize32, 0>;
-def Xi64 : X86TypeInfo<i64, "q", GR64, loadi64, i64mem, Imm32S, i64i32imm, 
+def Xi64 : X86TypeInfo<i64, "q", GR64, loadi64, i64mem, Imm32S, i64i32imm,
                       i64immSExt32_su, i64immSExt32, i64i8imm, i64immSExt8_su,
                       i64immSExt8, 1, OpSizeFixed, 1>;
 //===----------------------------------------------------------------------===//
 // Subsystems.
 //===----------------------------------------------------------------------===//
+
+//===----------------------------------------------------------------------===//
+// NaCl support (@LOCALMOD)
+//===----------------------------------------------------------------------===//
+include "X86InstrNaCl.td"
 
 include "X86InstrMisc.td"
 include "X86InstrTBM.td"
@@ -1446,4 +1459,3 @@ include "X86InstrVecCompiler.td"
 
 // Assembler mnemonic/instruction aliases
 include "X86InstrAsmAlias.td"
-
