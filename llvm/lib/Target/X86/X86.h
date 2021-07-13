@@ -43,6 +43,10 @@ FunctionPass *createCleanupLocalDynamicTLSPass();
 /// physical instructions.
 FunctionPass *createX86FloatingPointStackifierPass();
 
+// @LOCALMOD-BEGIN - Creates a pass to make instructions follow NaCl SFI rules.
+FunctionPass* createX86NaClRewritePass();
+// @LOCALMOD-END
+
 /// This pass inserts AVX vzeroupper instructions before each call to avoid
 /// transition penalty between functions encoded with AVX and SSE.
 FunctionPass *createX86IssueVZeroUpperPass();
