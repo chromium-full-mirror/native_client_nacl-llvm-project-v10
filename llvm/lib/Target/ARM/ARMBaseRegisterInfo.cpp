@@ -217,6 +217,11 @@ getReservedRegs(const MachineFunction &MF) const {
   // For v8.1m architecture
   markSuperRegs(Reserved, ARM::ZR);
 
+  // @LOCALMOD-START
+  if (STI.isTargetNaCl())
+    markSuperRegs(Reserved, ARM::R12);
+  // @LOCALMOD-END
+
   assert(checkAllSuperRegsMarked(Reserved));
   return Reserved;
 }
