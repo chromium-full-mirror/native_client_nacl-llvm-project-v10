@@ -130,10 +130,12 @@ void ARM::ARMMCNaClExpander::expandControlFlow(const MCInst &Inst,
     return expandIndirectBranch(BranchInst, Out, STI, false);
   }
 
-  if (numScratchRegs() == 0)
-    Error(Inst, "Not enough scratch registers provided");
-
-  MCRegister Scratch = getScratchReg(0);
+  MCRegister Scratch;
+  if (numScratchRegs() == 0) {
+    Scratch = ARM::R12;
+  } else {
+    Scratch = getScratchReg(0);
+  }
 
   MCInst SandboxedInst(Inst);
 
@@ -325,9 +327,12 @@ void ARM::ARMMCNaClExpander::expandPrefetch(const MCInst &Inst, MCStreamer &Out,
     return sandboxBaseDisp(Inst, *InstInfo, Inst.getOperand(0).getReg(), Out,
                            STI);
   } else if (Inst.getOpcode() == ARM::PLDrs) {
-    if (numScratchRegs() == 0)
-      Error(Inst, "Not enough scratch registers provided");
-    MCRegister Scratch = getScratchReg(0);
+    MCRegister Scratch;
+    if (numScratchRegs() == 0) {
+      Scratch = ARM::R12;
+    } else {
+      Scratch = getScratchReg(0);
+    }
 
     Out.emitBundleLock(false);
     Out.emitInstruction(getAddrInstr(Inst, *InstInfo, 0, Scratch), STI);
@@ -399,6 +404,7 @@ void ARM::ARMMCNaClExpander::expandLoadStore(const MCInst &Inst,
     return Out.emitInstruction(Inst, STI);
 
   MCRegister BaseReg = Inst.getOperand(MemIdx).getReg();
+  MCRegister Scratch;
   bool PostIncrement = false;
 
   switch (Inst.getOpcode()) {
@@ -429,10 +435,13 @@ void ARM::ARMMCNaClExpander::expandLoadStore(const MCInst &Inst,
     PostIncrement = true;
     [[fallthrough]];
   case ARM::STRrs:
-    if (numScratchRegs() == 0)
-      Error(Inst, "Not enough scratch registers provided");
+    if (numScratchRegs() == 0) {
+      Scratch = ARM::R12;
+    } else {
+      Scratch = getScratchReg(0);
+    }
     return sandboxBaseRegScale(Inst, *InstInfo, PostIncrement, 0, MemIdx,
-                               getScratchReg(0), Out, STI);
+                               Scratch, Out, STI);
   default:
     // Fall back case, should handle all other instructions that load/store
     // memory such as VFP/NEON loads/stores and prefetch instructions.
