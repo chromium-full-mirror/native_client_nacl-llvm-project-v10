@@ -65,8 +65,6 @@ public:
   bool mayModifyRegister(const MCInst &Inst, MCRegister Reg) const;
   bool explicitlyModifiesRegister(const MCInst &Inst, MCRegister Reg) const;
 
-  void replaceDefinitions(MCInst &Inst, MCRegister RegOld, MCRegister RegNew) const;
-
   virtual ~MCNaClExpander() = default;
   virtual bool expandInst(const MCInst &Inst, MCStreamer &Out,
                           const MCSubtargetInfo &STI) = 0;
