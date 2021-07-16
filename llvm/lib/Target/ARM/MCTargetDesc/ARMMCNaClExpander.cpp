@@ -22,11 +22,29 @@
 #include "llvm/MC/MCObjectFileInfo.h"
 #include "llvm/MC/MCRegisterInfo.h"
 #include "llvm/MC/MCStreamer.h"
+#include "llvm/Support/Debug.h"
 
 using namespace llvm;
 
+#define DEBUG_TYPE "saigo"
+
 const unsigned kBranchTargetMask = 0xC000000F;
 const unsigned kSandboxMask = 0xC0000000;
+
+namespace {
+
+// Replaces the first instance of PC in Inst with Reg
+void replaceFirstPCOperandWithReg(MCInst &Inst, MCRegister Reg) {
+  for (unsigned int i = 0; i < Inst.getNumOperands(); ++i) {
+    MCOperand &Op = Inst.getOperand(i);
+    if (Op.isReg() && Op.getReg() == ARM::PC) {
+      Op.setReg(Reg);
+      return;
+    }
+  }
+}
+
+} // namespace
 
 bool ARM::ARMMCNaClExpander::isValidScratchRegister(MCRegister Reg) const {
   return Reg != ARM::PC && Reg != ARM::SP;
@@ -138,8 +156,12 @@ void ARM::ARMMCNaClExpander::expandControlFlow(const MCInst &Inst,
   }
 
   MCInst SandboxedInst(Inst);
-
-  replaceDefinitions(SandboxedInst, ARM::PC, Scratch);
+  // Because Inst may affect the control flow, it will write to PC.
+  // There should always be at least one PC operand, and the one that determines
+  // the write target should be the first of them (output registers are
+  // listed before input registers).
+  // Write to the scratch register instead of PC.
+  replaceFirstPCOperandWithReg(SandboxedInst, Scratch);
   doExpandInst(SandboxedInst, Out, STI);
 
   MCInst BranchInst = getConditionalBranch(Scratch, Inst, *InstInfo);
