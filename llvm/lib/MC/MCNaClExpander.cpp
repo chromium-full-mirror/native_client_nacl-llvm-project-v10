@@ -103,15 +103,4 @@ bool MCNaClExpander::explicitlyModifiesRegister(const MCInst &Inst,
   }
   return false;
 }
-
-// Replaces all definitions of RegOld with RegNew in Inst
-void MCNaClExpander::replaceDefinitions(MCInst &Inst, MCRegister RegOld,
-                                        MCRegister RegNew) const {
-  const MCInstrDesc &Desc = InstInfo->get(Inst.getOpcode());
-  for (int i = 0; i < Desc.NumDefs; ++i) {
-    MCOperand &Op = Inst.getOperand(i);
-    if (Op.isReg() && Op.getReg() == RegOld)
-      Op.setReg(RegNew);
-  }
-}
 }
