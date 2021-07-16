@@ -72,3 +72,10 @@
 //CHECK-NEXT: 	bicne	r11, r11, #-1073741809
 //CHECK-NEXT: 	bxne	r11
 //CHECK-NEXT: 	.bundle_unlock
+
+  pop	{r4, r5, r6, pc}
+//CHECK:   pop	{r4, r5, r6, r11}
+//CHECK-NEXT:   .bundle_lock
+//CHECK-NEXT:   bic	r11, r11, #-1073741809
+//CHECK-NEXT:   bx	r11
+//CHECK-NEXT:   .bundle_unlock
