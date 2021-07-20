@@ -251,6 +251,22 @@ NaClToolChain::NaClToolChain(const Driver &D, const llvm::Triple &Triple,
   }
 
   NaClArmMacrosPath = GetFilePath("nacl-arm-macros.s");
+
+  // @LOCALMOD-START
+  // On ARM, don't use the integrated assembler when assembling .S / .s files.
+  if (Triple.isARM()) {
+    for (Arg *A : Args) {
+      if (A->getOption().getKind() == Option::InputClass) {
+        types::ID Ty = types::TY_INVALID;
+        if (const char *Ext = strrchr(A->getValue(), '.'))
+          Ty = LookupTypeForExtension(Ext + 1);
+
+        if (Ty == types::TY_Asm || Ty == types::TY_PP_Asm)
+          UseIntegratedAssemblerByDefault = false;
+      }
+    }
+  }
+  // @LOCALMOD-END
 }
 
 void NaClToolChain::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
