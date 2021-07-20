@@ -200,6 +200,15 @@ SDValue X86SelectionDAGInfo::EmitTargetCodeForMemset(
     SelectionDAG &DAG, const SDLoc &dl, SDValue Chain, SDValue Dst, SDValue Val,
     SDValue Size, Align Alignment, bool isVolatile, bool AlwaysInline,
     MachinePointerInfo DstPtrInfo) const {
+
+  // @LOCALMOD-BEGIN
+  const X86Subtarget &Subtarget =
+    DAG.getMachineFunction().getSubtarget<X86Subtarget>();
+
+  if (Subtarget.isTargetNaCl())
+    return SDValue();
+  // @LOCALMOD-END
+
   // If to a segment-relative address space, use the default lowering.
   if (DstPtrInfo.getAddrSpace() >= 256)
     return SDValue();
@@ -327,6 +336,11 @@ SDValue X86SelectionDAGInfo::EmitTargetCodeForMemcpy(
 
   const X86Subtarget &Subtarget =
       DAG.getMachineFunction().getSubtarget<X86Subtarget>();
+
+  // @LOCALMOD-BEGIN
+  if (Subtarget.isTargetNaCl())
+    return SDValue();
+  // @LOCALMOD-END
 
   // If enabled and available, use fast short rep mov.
   if (UseFSRMForMemcpy && Subtarget.hasFSRM())
