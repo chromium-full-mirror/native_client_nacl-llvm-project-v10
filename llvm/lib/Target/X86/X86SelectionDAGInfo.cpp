@@ -62,6 +62,11 @@ SDValue X86SelectionDAGInfo::EmitTargetCodeForMemset(
   const X86Subtarget &Subtarget =
       DAG.getMachineFunction().getSubtarget<X86Subtarget>();
 
+  // @LOCALMOD-BEGIN
+  if (Subtarget.isTargetNaCl())
+    return SDValue();
+  // @LOCALMOD-END
+
   // If not DWORD aligned or size is more than the threshold, call the library.
   // The libc version is likely to be faster for these cases. It can use the
   // address value and run time information about the CPU.
@@ -277,6 +282,11 @@ SDValue X86SelectionDAGInfo::EmitTargetCodeForMemcpy(
 
   const X86Subtarget &Subtarget =
       DAG.getMachineFunction().getSubtarget<X86Subtarget>();
+
+  // @LOCALMOD-BEGIN
+  if (Subtarget.isTargetNaCl())
+    return SDValue();
+  // @LOCALMOD-END
 
   // If enabled and available, use fast short rep mov.
   if (UseFSRMForMemcpy && Subtarget.hasFSRM())
