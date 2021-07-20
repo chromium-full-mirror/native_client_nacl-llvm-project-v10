@@ -2,6 +2,11 @@
 ; RUN: llc < %s -mtriple=x86_64-linux -mattr=-avx | FileCheck %s -check-prefix=X64
 ; Win64 has not supported byval yet.
 ; RUN: llc < %s -mtriple=i686-- -mattr=-avx | FileCheck %s -check-prefix=X86
+; @LOCALMOD-START
+; NaCl shouldn't emit rep movs instructions.
+; RUN: llc < %s -mtriple=x86_64-nacl -mattr=-avx | FileCheck %s -check-prefix=NACL
+; NACL-NOT: rep
+; @LOCALMOD-END
 
 %struct.s = type { i64, i64, i64, i64, i64, i64, i64, i64,
                    i64, i64, i64, i64, i64, i64, i64, i64,
