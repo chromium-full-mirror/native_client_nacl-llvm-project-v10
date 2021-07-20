@@ -71,7 +71,7 @@ public:
                            llvm::opt::ArgStringList &CmdArgs) const override;
 
   bool IsIntegratedAssemblerDefault() const override {
-    return true; // @LOCALMOD
+    return UseIntegratedAssemblerByDefault; // @LOCALMOD
   }
 
   // Get the path to the file containing NaCl's ARM macros.
@@ -88,6 +88,7 @@ protected:
 
 private:
   std::string NaClArmMacrosPath;
+  bool UseIntegratedAssemblerByDefault = true; // @LOCALMOD
 };
 
 } // end namespace toolchains
