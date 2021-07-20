@@ -59,6 +59,11 @@ SDValue X86SelectionDAGInfo::EmitTargetCodeForMemset(
   assert(!isBaseRegConflictPossible(DAG, ClobberSet));
 #endif
 
+  // @LOCALMOD-BEGIN
+  if (Subtarget.isTargetNaCl())
+    return SDValue();
+  // @LOCALMOD-END
+
   // If to a segment-relative address space, use the default lowering.
   if (DstPtrInfo.getAddrSpace() >= 256)
     return SDValue();
@@ -275,6 +280,11 @@ SDValue X86SelectionDAGInfo::EmitTargetCodeForMemcpy(
 
   const X86Subtarget &Subtarget =
       DAG.getMachineFunction().getSubtarget<X86Subtarget>();
+
+  // @LOCALMOD-BEGIN
+  if (Subtarget.isTargetNaCl())
+    return SDValue();
+  // @LOCALMOD-END
 
   // If enabled and available, use fast short rep mov.
   if (UseFSRMForMemcpy && Subtarget.hasFSRM())
