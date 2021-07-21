@@ -61,6 +61,11 @@ ARMELFMCAsmInfo::ARMELFMCAsmInfo(const Triple &TheTriple) {
 
   // Exceptions handling
   switch (TheTriple.getOS()) {
+  // @LOCALMOD-START
+  case Triple::NaCl:
+    ExceptionsType = ExceptionHandling::DwarfCFI;
+    break;
+  // @LOCALMOD-END
   case Triple::NetBSD:
     ExceptionsType = ExceptionHandling::DwarfCFI;
     break;
