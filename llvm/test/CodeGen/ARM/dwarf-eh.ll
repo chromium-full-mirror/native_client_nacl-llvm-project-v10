@@ -1,5 +1,8 @@
 ; RUN: llc -mtriple=arm-netbsd-eabi -o - -filetype=asm -simplifycfg-require-and-preserve-domtree=1 %s | \
 ; RUN: FileCheck %s
+; @LOCALMOD-START
+; RUN: llc -mtriple=arm-nacl -o - -filetype=asm %s | FileCheck %s
+; @LOCALMOD-END
 ; RUN: llc -mtriple=arm-netbsd-eabi -o - -filetype=asm -simplifycfg-require-and-preserve-domtree=1 %s \
 ; RUN: -relocation-model=pic | FileCheck -check-prefix=CHECK-PIC %s
 
