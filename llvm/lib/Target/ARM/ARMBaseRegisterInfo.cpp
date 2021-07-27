@@ -66,6 +66,10 @@ static unsigned getFramePointerReg(const ARMSubtarget &STI) {
 const MCPhysReg*
 ARMBaseRegisterInfo::getCalleeSavedRegs(const MachineFunction *MF) const {
   const ARMSubtarget &STI = MF->getSubtarget<ARMSubtarget>();
+  // @LOCALMOD-START
+  if (STI.isTargetNaCl())
+   return CSR_NaCl_SaveList;
+  // @LOCALMOD-END
   bool UseSplitPush = STI.splitFramePushPop(*MF);
   const MCPhysReg *RegList =
       STI.isTargetDarwin()
@@ -124,6 +128,10 @@ const uint32_t *
 ARMBaseRegisterInfo::getCallPreservedMask(const MachineFunction &MF,
                                           CallingConv::ID CC) const {
   const ARMSubtarget &STI = MF.getSubtarget<ARMSubtarget>();
+  // @LOCALMOD-START
+  if (STI.isTargetNaCl())
+   return CSR_NaCl_RegMask;
+  // @LOCALMOD-END
   if (CC == CallingConv::GHC)
     // This is academic because all GHC calls are (supposed to be) tail calls
     return CSR_NoRegs_RegMask;
