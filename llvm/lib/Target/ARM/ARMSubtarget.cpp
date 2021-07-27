@@ -212,6 +212,13 @@ void ARMSubtarget::initSubtargetFeatures(StringRef CPU, StringRef FS) {
   if (isTargetNaCl() || isAAPCS16_ABI())
     stackAlignment = Align(16);
 
+  // @LOCALMOD-BEGIN
+  if (isTargetNaCl()) {
+    // NaCl reserves R9 for TLS.
+    ReserveR9 = true;
+  }
+  // @LOCALMOD-END
+
   // FIXME: Completely disable sibcall for Thumb1 since ThumbRegisterInfo::
   // emitEpilogue is not ready for them. Thumb tail calls also use t2B, as
   // the Thumb1 16-bit unconditional branch doesn't have sufficient relocation
