@@ -712,6 +712,11 @@ bool ARMDAGToDAGISel::SelectAddrModeImm12(SDValue N,
 
 bool ARMDAGToDAGISel::SelectLdStSOReg(SDValue N, SDValue &Base, SDValue &Offset,
                                       SDValue &Opc) {
+  // @LOCALMOD-BEGIN
+  // Disallow offsets of Reg + Reg.
+  if (Subtarget->isTargetNaCl())
+    return false;
+  // @LOCALMOD-END
   if (N.getOpcode() == ISD::MUL &&
       ((!Subtarget->isLikeA9() && !Subtarget->isSwift()) || N.hasOneUse())) {
     if (ConstantSDNode *RHS = dyn_cast<ConstantSDNode>(N.getOperand(1))) {
