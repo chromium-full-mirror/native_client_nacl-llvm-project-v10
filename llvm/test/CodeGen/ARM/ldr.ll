@@ -1,4 +1,8 @@
 ; RUN: llc -mtriple=arm-eabi %s -o - | FileCheck %s
+; @LOCALMOD-START
+; RUN: llc -mtriple=arm-nacl %s -o - | FileCheck %s --check-prefix=NACL
+; NACL-NOT: ldr r0{{.*}}lsl{{.*}}
+; @LOCALMOD-END
 
 define i32 @f1(ptr %v) {
 ; CHECK-LABEL: f1:
