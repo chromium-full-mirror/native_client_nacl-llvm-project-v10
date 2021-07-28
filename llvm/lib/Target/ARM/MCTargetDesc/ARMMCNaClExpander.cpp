@@ -99,9 +99,14 @@ void ARM::ARMMCNaClExpander::expandIndirectBranch(const MCInst &Inst,
   assert(Inst.getOperand(0).isReg());
   MCRegister BranchReg = Inst.getOperand(0).getReg();
 
-  // No need to sandbox branch through sp or pc
-  if (BranchReg == ARM::SP || BranchReg == ARM::PC)
-    return Out.emitInstruction(Inst, STI);
+  // All calls have to be aligned to bundle end.
+  // No need for additional sandboxing for a branch through sp or pc.
+  if (BranchReg == ARM::SP || BranchReg == ARM::PC) {
+    Out.emitBundleLock(isCall);
+    Out.emitInstruction(Inst, STI);
+    Out.emitBundleUnlock();
+    return;
+  }
 
   MCRegister PredReg;
   ARMCC::CondCodes Pred = getPredicate(Inst, *InstInfo, PredReg);
@@ -120,9 +125,11 @@ void ARM::ARMMCNaClExpander::expandCall(const MCInst &Inst, MCStreamer &Out,
     expandIndirectBranch(Inst, Out, STI, true);
   }
 
-  // Otherwise, we are a direct call, so just emit
+  // Otherwise, we are a direct call, so just align to bundle end.
   else {
+    Out.emitBundleLock(true);
     Out.emitInstruction(Inst, STI);
+    Out.emitBundleUnlock();
   }
 }
 

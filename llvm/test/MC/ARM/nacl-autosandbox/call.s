@@ -3,7 +3,9 @@
 foo:
 
 	bl foo
-//CHECK:    bl	foo
+//CHECK:    .bundle_lock align_to_end
+//CHECK-NEXT:    bl	foo
+//CHECK-NEXT: 	.bundle_unlock
 
 	blx r0
 //CHECK:    .bundle_lock align_to_end
@@ -12,14 +14,20 @@ foo:
 //CHECK-NEXT: 	.bundle_unlock
 
 	blx sp
-//CHECK:    blx	sp
+//CHECK:    .bundle_lock align_to_end
+//CHECK-NEXT:    blx	sp
+//CHECK-NEXT: 	.bundle_unlock
 
 	blx pc
-//CHECK:    blx	pc
+//CHECK:    .bundle_lock align_to_end
+//CHECK-NEXT:    blx	pc
+//CHECK-NEXT: 	.bundle_unlock
 
 
 	blne foo
-//CHECK:    blne	foo
+//CHECK:    .bundle_lock align_to_end
+//CHECK-NEXT:    blne	foo
+//CHECK-NEXT: 	.bundle_unlock
 
 	blxne r0
 //CHECK:    .bundle_lock align_to_end
@@ -28,7 +36,11 @@ foo:
 //CHECK-NEXT: 	.bundle_unlock
 
 	blxne sp
-//CHECK:    blxne	sp
+//CHECK:    .bundle_lock align_to_end
+//CHECK-NEXT:    blxne	sp
+//CHECK-NEXT: 	.bundle_unlock
 
 	blxne pc
-//CHECK:    blxne	pc
+//CHECK:    .bundle_lock align_to_end
+//CHECK-NEXT:    blxne	pc
+//CHECK-NEXT: 	.bundle_unlock
