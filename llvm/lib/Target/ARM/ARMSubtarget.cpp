@@ -217,6 +217,8 @@ void ARMSubtarget::initSubtargetFeatures(StringRef CPU, StringRef FS) {
   if (isTargetNaCl()) {
     // NaCl reserves R9 for TLS.
     ReserveR9 = true;
+    // CLREX does not validate.
+    HasV7Clrex = false;
   }
   // @LOCALMOD-END
 
