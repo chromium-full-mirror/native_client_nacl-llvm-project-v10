@@ -3,6 +3,10 @@
 ; RUN: llc < %s -mtriple=thumbv6-apple-ios -verify-machineinstrs | FileCheck %s --check-prefix=CHECK-T1
 ; RUN: llc < %s -mtriple=thumbv6-apple-ios -verify-machineinstrs -mcpu=cortex-m0 | FileCheck %s --check-prefix=CHECK-T1-M0
 ; RUN: llc < %s -mtriple=thumbv7--none-eabi -thread-model single -verify-machineinstrs | FileCheck %s --check-prefix=CHECK-BAREMETAL
+; @LOCALMOD-START
+; RUN: llc < %s -mtriple=arm-nacl | FileCheck %s --check-prefixes=NACL
+; NACL-NOT: clrex
+; @LOCALMOD-END
 
 target datalayout = "e-m:e-p:32:32-i64:64-v128:64:128-a:0:32-n32-S64"
 
