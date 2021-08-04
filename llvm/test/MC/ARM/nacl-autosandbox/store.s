@@ -281,3 +281,117 @@
 //CHECK-NEXT: 	bicne	r1, r1, #-1073741824
 //CHECK-NEXT: 	strne	r0, [r1], r2, lsl #8
 //CHECK-NEXT: 	.bundle_unlock
+
+  strb	r0, [r6, #2]
+//CHECK:    .bundle_lock
+//CHECK-NEXT: 	bic	r6, r6, #-1073741824
+//CHECK-NEXT: 	strb	r0, [r6, #2]
+//CHECK-NEXT: 	.bundle_unlock
+
+  strh	r0, [r6, #2]
+//CHECK:    .bundle_lock
+//CHECK-NEXT: 	bic	r6, r6, #-1073741824
+//CHECK-NEXT: 	strh	r0, [r6, #2]
+//CHECK-NEXT: 	.bundle_unlock
+
+  strd	r0, r1, [r6, #2]
+//CHECK:    .bundle_lock
+//CHECK-NEXT: 	bic	r6, r6, #-1073741824
+//CHECK-NEXT: 	strd	r0, r1, [r6, #2]
+//CHECK-NEXT: 	.bundle_unlock
+
+  strb	r0, [r6, r2]
+//CHECK:    .bundle_lock
+//CHECK-NEXT: 	add	r11, r6, r2
+//CHECK-NEXT: 	bic	r11, r11, #-1073741824
+//CHECK-NEXT: 	strb	r0, [r11]
+//CHECK-NEXT: 	.bundle_unlock
+
+  strh	r0, [r6, r2]
+//CHECK:    .bundle_lock
+//CHECK-NEXT: 	add	r11, r6, r2
+//CHECK-NEXT: 	bic	r11, r11, #-1073741824
+//CHECK-NEXT: 	strh	r0, [r11]
+//CHECK-NEXT: 	.bundle_unlock
+
+  strd	r0, r1, [r6, r2]
+//CHECK:    .bundle_lock
+//CHECK-NEXT: 	add	r11, r6, r2
+//CHECK-NEXT: 	bic	r11, r11, #-1073741824
+//CHECK-NEXT: 	strd	r0, r1, [r11]
+//CHECK-NEXT: 	.bundle_unlock
+
+  strb	r0, [r6, #2]!
+//CHECK:    .bundle_lock
+//CHECK-NEXT: 	bic	r6, r6, #-1073741824
+//CHECK-NEXT: 	strb	r0, [r6, #2]!
+//CHECK-NEXT: 	.bundle_unlock
+
+  strh	r0, [r6, #2]!
+//CHECK:    .bundle_lock
+//CHECK-NEXT: 	bic	r6, r6, #-1073741824
+//CHECK-NEXT: 	strh	r0, [r6, #2]!
+//CHECK-NEXT: 	.bundle_unlock
+
+  strd	r0, r1, [r6, #2]!
+//CHECK:    .bundle_lock
+//CHECK-NEXT: 	bic	r6, r6, #-1073741824
+//CHECK-NEXT: 	strd	r0, r1, [r6, #2]!
+//CHECK-NEXT: 	.bundle_unlock
+
+  strb	r0, [r6, r1]!
+//CHECK:    .bundle_lock
+//CHECK-NEXT: 	add	r6, r6, r1
+//CHECK-NEXT: 	bic	r6, r6, #-1073741824
+//CHECK-NEXT: 	strb	r0, [r6]
+//CHECK-NEXT: 	.bundle_unlock
+
+  strh	r0, [r6, r1]!
+//CHECK:    .bundle_lock
+//CHECK-NEXT: 	add	r6, r6, r1
+//CHECK-NEXT: 	bic	r6, r6, #-1073741824
+//CHECK-NEXT: 	strh	r0, [r6]
+//CHECK-NEXT: 	.bundle_unlock
+
+  strd	r0, r1, [r6, r2]!
+//CHECK:    .bundle_lock
+//CHECK-NEXT: 	add	r6, r6, r2
+//CHECK-NEXT: 	bic	r6, r6, #-1073741824
+//CHECK-NEXT: 	strd	r0, r1, [r6]
+//CHECK-NEXT: 	.bundle_unlock
+
+  strb	r0, [r6], #2
+//CHECK:    .bundle_lock
+//CHECK-NEXT: 	bic	r6, r6, #-1073741824
+//CHECK-NEXT: 	strb	r0, [r6], #2
+//CHECK-NEXT: 	.bundle_unlock
+
+  strh	r0, [r6], #2
+//CHECK:    .bundle_lock
+//CHECK-NEXT: 	bic	r6, r6, #-1073741824
+//CHECK-NEXT: 	strh	r0, [r6], #2
+//CHECK-NEXT: 	.bundle_unlock
+
+  strd	r0, r1, [r6], #2
+//CHECK:    .bundle_lock
+//CHECK-NEXT: 	bic	r6, r6, #-1073741824
+//CHECK-NEXT: 	strd	r0, r1, [r6], #2
+//CHECK-NEXT: 	.bundle_unlock
+
+  strb	r0, [r6], r1
+//CHECK:    .bundle_lock
+//CHECK-NEXT: 	bic	r6, r6, #-1073741824
+//CHECK-NEXT: 	strb	r0, [r6], r1
+//CHECK-NEXT: 	.bundle_unlock
+
+  strh	r0, [r6], r1
+//CHECK:    .bundle_lock
+//CHECK-NEXT: 	bic	r6, r6, #-1073741824
+//CHECK-NEXT: 	strh	r0, [r6], r1
+//CHECK-NEXT: 	.bundle_unlock
+
+  strd	r0, r1, [r6], r2
+//CHECK:    .bundle_lock
+//CHECK-NEXT: 	bic	r6, r6, #-1073741824
+//CHECK-NEXT: 	strd	r0, r1, [r6], r2
+//CHECK-NEXT: 	.bundle_unlock
