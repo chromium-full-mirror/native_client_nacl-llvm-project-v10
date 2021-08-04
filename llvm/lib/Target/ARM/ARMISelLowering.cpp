@@ -21441,7 +21441,7 @@ Value *ARMTargetLowering::emitLoadLinked(IRBuilderBase &Builder, Type *ValueTy,
 
 void ARMTargetLowering::emitAtomicCmpXchgNoStoreLLBalance(
     IRBuilderBase &Builder) const {
-  if (!Subtarget->hasV7Ops())
+  if (!Subtarget->hasV7Clrex()) // @LOCALMOD
     return;
   Builder.CreateIntrinsic(Intrinsic::arm_clrex, {}, {});
 }
