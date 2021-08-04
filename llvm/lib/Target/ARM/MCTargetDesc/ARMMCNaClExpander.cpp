@@ -299,21 +299,46 @@ static MCInst getAddrInstr(const MCInst &Inst, const MCInstrInfo &II,
 
 // Demote the load/store opcode to the sandboxed equivalent, i.e.,
 // the version that uses a base + immediate displacement.
-// TODO: add support for different sizes, like LDRB, LDRH, etc
 static unsigned sandboxOpcode(unsigned Opcode) {
   switch (Opcode) {
   default:
     return Opcode;
-  case ARM::LDRi12:
   case ARM::LDR_PRE_IMM:
   case ARM::LDR_PRE_REG:
+  case ARM::LDR_POST_IMM:
+  case ARM::LDR_POST_REG:
   case ARM::LDRrs:
     return ARM::LDRi12;
-  case ARM::STRi12:
+  case ARM::LDRH_PRE:
+  case ARM::LDRH_POST:
+    return ARM::LDRH;
+  case ARM::LDRB_PRE_IMM:
+  case ARM::LDRB_PRE_REG:
+  case ARM::LDRB_POST_IMM:
+  case ARM::LDRB_POST_REG:
+  case ARM::LDRBrs:
+    return ARM::LDRBi12;
+  case ARM::LDRD_PRE:
+  case ARM::LDRD_POST:
+    return ARM::LDRD;
   case ARM::STR_PRE_IMM:
   case ARM::STR_PRE_REG:
+  case ARM::STR_POST_IMM:
+  case ARM::STR_POST_REG:
   case ARM::STRrs:
     return ARM::STRi12;
+  case ARM::STRH_PRE:
+  case ARM::STRH_POST:
+    return ARM::STRH;
+  case ARM::STRB_PRE_IMM:
+  case ARM::STRB_PRE_REG:
+  case ARM::STRB_POST_IMM:
+  case ARM::STRB_POST_REG:
+  case ARM::STRBrs:
+    return ARM::STRBi12;
+  case ARM::STRD_PRE:
+  case ARM::STRD_POST:
+    return ARM::STRD;
   }
 }
 
@@ -341,7 +366,20 @@ static void sandboxBaseRegScale(const MCInst &Inst, const MCInstrInfo &II,
     MCInst SandboxedInst;
     SandboxedInst.setOpcode(sandboxOpcode(Inst.getOpcode()));
     SandboxedInst.addOperand(Inst.getOperand(RegIdx));
+    switch (SandboxedInst.getOpcode()) {
+    // STRD and LDRD have two target registers.
+    case ARM::STRD:
+    case ARM::LDRD:
+      SandboxedInst.addOperand(Inst.getOperand(RegIdx + 1));
+    }
     SandboxedInst.addOperand(MCOperand::createReg(Target));
+    switch (SandboxedInst.getOpcode()) {
+    case ARM::STRH:
+    case ARM::STRD:
+    case ARM::LDRH:
+    case ARM::LDRD:
+      SandboxedInst.addOperand(MCOperand::createReg(ARM::NoRegister));
+    }
     SandboxedInst.addOperand(MCOperand::createImm(0));
     SandboxedInst.addOperand(MCOperand::createImm(Pred));
     SandboxedInst.addOperand(MCOperand::createReg(PredReg));
@@ -381,6 +419,56 @@ void ARM::ARMMCNaClExpander::expandPrefetch(const MCInst &Inst, MCStreamer &Out,
   } else {
     Out.emitInstruction(Inst, STI);
   }
+}
+
+// These can use reg + imm or reg + reg addressing, but this is not visible from
+// the opcode.
+static void sandboxHalfwordOrDualwordLoadStore(const MCInst &Inst,
+                                               const MCInstrInfo &II,
+                                               MCRegister BaseReg,
+                                               MCRegister ScratchReg,
+                                               unsigned MemIdx, MCStreamer &Out,
+                                               const MCSubtargetInfo &STI) {
+  bool postIncrement = false;
+  bool isRegRegAddressing =
+      Inst.getNumOperands() > MemIdx + 1 &&
+      Inst.getOperand(MemIdx + 1).isReg() &&
+      Inst.getOperand(MemIdx + 1).getReg() != ARM::NoRegister;
+  switch (Inst.getOpcode()) {
+  case ARM::LDRH_POST:
+  case ARM::LDRD_POST:
+    postIncrement = true;
+    [[fallthrough]];
+  case ARM::LDRH_PRE:
+  case ARM::LDRD_PRE:
+    if (isRegRegAddressing) {
+      return sandboxBaseRegScale(Inst, II, postIncrement, 0, MemIdx, BaseReg,
+                                 Out, STI);
+    }
+    break;
+  case ARM::STRH_POST:
+  case ARM::STRD_POST:
+    postIncrement = true;
+    [[fallthrough]];
+  case ARM::STRH_PRE:
+  case ARM::STRD_PRE:
+    if (isRegRegAddressing) {
+      return sandboxBaseRegScale(Inst, II, postIncrement, 1, MemIdx, BaseReg,
+                                 Out, STI);
+    }
+    break;
+  case ARM::LDRH:
+  case ARM::LDRD:
+  case ARM::STRH:
+  case ARM::STRD:
+    if (isRegRegAddressing) {
+      return sandboxBaseRegScale(Inst, II, postIncrement, 0, MemIdx, ScratchReg,
+                                 Out, STI);
+    }
+  }
+
+  assert(!isRegRegAddressing);
+  return sandboxBaseDisp(Inst, II, BaseReg, Out, STI);
 }
 
 void ARM::ARMMCNaClExpander::expandLoadStore(const MCInst &Inst,
@@ -443,27 +531,37 @@ void ARM::ARMMCNaClExpander::expandLoadStore(const MCInst &Inst,
   case ARM::LDRi12:
   case ARM::STRi12:
   case ARM::LDR_PRE_IMM:
+  case ARM::LDRB_PRE_IMM:
   case ARM::STR_PRE_IMM:
+  case ARM::STRB_PRE_IMM:
   case ARM::LDR_POST_IMM:
+  case ARM::LDRB_POST_IMM:
   case ARM::STR_POST_IMM:
+  case ARM::STRB_POST_IMM:
     return sandboxBaseDisp(Inst, *InstInfo, Inst.getOperand(MemIdx).getReg(),
                            Out, STI);
   case ARM::LDR_PRE_REG:
+  case ARM::LDRB_PRE_REG:
     return sandboxBaseRegScale(Inst, *InstInfo, false, 0, MemIdx, BaseReg, Out,
                                STI);
   case ARM::STR_PRE_REG:
+  case ARM::STRB_PRE_REG:
     return sandboxBaseRegScale(Inst, *InstInfo, false, 1, MemIdx, BaseReg, Out,
                                STI);
   case ARM::LDR_POST_REG:
+  case ARM::LDRB_POST_REG:
     PostIncrement = true;
     [[fallthrough]];
   case ARM::LDRrs:
+  case ARM::LDRBrs:
     return sandboxBaseRegScale(Inst, *InstInfo, PostIncrement, 0, MemIdx,
                                Inst.getOperand(0).getReg(), Out, STI);
   case ARM::STR_POST_REG:
+  case ARM::STRB_POST_REG:
     PostIncrement = true;
     [[fallthrough]];
   case ARM::STRrs:
+  case ARM::STRBrs:
     if (numScratchRegs() == 0) {
       Scratch = ARM::R12;
     } else {
@@ -471,6 +569,28 @@ void ARM::ARMMCNaClExpander::expandLoadStore(const MCInst &Inst,
     }
     return sandboxBaseRegScale(Inst, *InstInfo, PostIncrement, 0, MemIdx,
                                Scratch, Out, STI);
+  case ARM::LDRH:
+  case ARM::LDRH_PRE:
+  case ARM::LDRH_POST:
+  case ARM::LDRD:
+  case ARM::LDRD_PRE:
+  case ARM::LDRD_POST:
+    return sandboxHalfwordOrDualwordLoadStore(Inst, *InstInfo, BaseReg,
+                                              Inst.getOperand(0).getReg(),
+                                              MemIdx, Out, STI);
+  case ARM::STRH:
+  case ARM::STRH_PRE:
+  case ARM::STRH_POST:
+  case ARM::STRD:
+  case ARM::STRD_PRE:
+  case ARM::STRD_POST:
+    if (numScratchRegs() == 0) {
+      Scratch = ARM::R12;
+    } else {
+      Scratch = getScratchReg(0);
+    }
+    return sandboxHalfwordOrDualwordLoadStore(Inst, *InstInfo, BaseReg, Scratch,
+                                              MemIdx, Out, STI);
   default:
     // Fall back case, should handle all other instructions that load/store
     // memory such as VFP/NEON loads/stores and prefetch instructions.
