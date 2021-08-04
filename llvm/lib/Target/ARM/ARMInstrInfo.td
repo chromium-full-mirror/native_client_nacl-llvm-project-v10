@@ -3175,9 +3175,11 @@ def LDRConstPool
 // Store
 
 // Stores with truncate
+let mayStore = 1 in { // @LOCALMOD
 def STRH : AI3str<0b1011, (outs), (ins GPR:$Rt, addrmode3:$addr), StMiscFrm,
                IIC_iStore_bh_r, "strh", "\t$Rt, $addr",
                [(truncstorei16 GPR:$Rt, addrmode3:$addr)]>;
+} // @LOCALMOD
 
 // Store doubleword
 let mayStore = 1, hasSideEffects = 0, hasExtraSrcRegAllocReq = 1 in {
