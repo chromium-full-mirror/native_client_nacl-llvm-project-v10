@@ -3124,9 +3124,11 @@ def LDRConstPool
 // Store
 
 // Stores with truncate
+let mayStore = 1 in { // @LOCALMOD
 def STRH : AI3str<0b1011, (outs), (ins GPR:$Rt, addrmode3:$addr), StMiscFrm,
                IIC_iStore_bh_r, "strh", "\t$Rt, $addr",
                [(truncstorei16 GPR:$Rt, addrmode3:$addr)]>;
+} // @LOCALMOD
 
 // Store doubleword
 let mayStore = 1, hasSideEffects = 0, hasExtraSrcRegAllocReq = 1 in {
@@ -3270,6 +3272,7 @@ def STRH_preidx: ARMPseudoInst<(outs GPR:$Rn_wb),
 
 
 
+let mayStore = 1 in { // @LOCALMOD
 def STRH_PRE  : AI3ldstidx<0b1011, 0, 1, (outs GPR:$Rn_wb),
                            (ins GPR:$Rt, addrmode3_pre:$addr), IndexModePre,
                            StMiscFrm, IIC_iStore_bh_ru,
@@ -3301,6 +3304,7 @@ def STRH_POST : AI3ldstidx<0b1011, 0, 0, (outs GPR:$Rn_wb),
   let Inst{3-0}   = offset{3-0};    // imm3_0/Rm
   let DecoderMethod = "DecodeAddrMode3Instruction";
 }
+} // @LOCALMOD
 
 let mayStore = 1, hasSideEffects = 0, hasExtraSrcRegAllocReq = 1 in {
 def STRD_PRE : AI3ldstidx<0b1111, 0, 1, (outs GPR:$Rn_wb),
