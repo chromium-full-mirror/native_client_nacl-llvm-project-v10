@@ -37,7 +37,8 @@ void ARMElfTargetObjectFile::Initialize(MCContext &Ctx,
   TargetLoweringObjectFileELF::Initialize(Ctx, TM);
   InitializeELF(isAAPCS_ABI);
 
-  if (isAAPCS_ABI) {
+  if (isAAPCS_ABI && TM.getMCAsmInfo()->getExceptionHandlingType() ==
+                     ExceptionHandling::ARM) { // @LOCALMOD
     LSDASection = nullptr;
   }
 
