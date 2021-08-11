@@ -1,4 +1,8 @@
-; RUN: llc < %s -mtriple=arm-nacl-gnueabi -nacl-enable-autosandboxing=false | FileCheck %s
+; RUN: llc < %s -mtriple=armv7-nacl-gnueabi -nacl-enable-autosandboxing=false | FileCheck %s
+; @LOCALMOD-START
+; Change to armv7, (or alternatively +v6t2) since NaCl needs movw/movt to
+; materialize the @va_list global address. Also, disable autosandboxing.
+; @LOCALMOD-END
 
 declare void @llvm.va_start(ptr)
 declare void @external_func(ptr)

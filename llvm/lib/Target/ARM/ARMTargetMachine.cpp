@@ -602,10 +602,16 @@ void ARMPassConfig::addPreEmitPass2() {
   // Inserts BTIs at the start of functions and indirectly-called basic blocks,
   // so passes cannot add to the start of basic blocks once this has run.
   addPass(createARMBranchTargetsPass());
-  // Inserts Constant Islands. Block sizes cannot be increased after this point,
-  // as this may push the branch ranges and load offsets of accessing constant
-  // pools out of range..
-  addPass(createARMConstantIslandPass());
+  
+  // @LOCALMOD-START
+  if (!TM->getTargetTriple().isOSNaCl()) {
+    // Inserts Constant Islands. Block sizes cannot be increased after this,
+    // as this may push the branch ranges and load offsets of accessing constant
+    // pools out of range..
+    addPass(createARMConstantIslandPass());
+  }
+  // @LOCALMOD-END
+
   // Finalises Low-Overhead Loops. This replaces pseudo instructions with real
   // instructions, but the pseudos all have conservative sizes so that block
   // sizes will only be decreased by this pass.
