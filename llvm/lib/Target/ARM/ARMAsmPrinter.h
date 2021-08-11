@@ -92,6 +92,12 @@ public:
 
   void emitConstantPool() override {
     // we emit constant pools customly!
+    // @LOCALMOD-START
+    // Usually this does nothing on ARM as constants pools are handled with
+    // custom code (for constant islands).
+    // When not using constant islands, fall back to the default implementation.
+    if (!Subtarget->useConstIslands()) AsmPrinter::emitConstantPool();
+    // @LOCALMOD-END
   }
   void emitFunctionBodyEnd() override;
   void emitFunctionEntryLabel() override;
