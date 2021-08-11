@@ -656,6 +656,18 @@ bool ARMDAGToDAGISel::SelectAddLikeOr(SDNode *Parent, SDValue N, SDValue &Out) {
   return CurDAG->haveNoCommonBitsSet(N, Parent->getOperand(1));
 }
 
+// @LOCALMOD-START
+static bool ShouldOperandBeUnwrappedForUseAsBaseAddress(
+  SDValue& N, const ARMSubtarget* Subtarget) {
+  assert (N.getOpcode() == ARMISD::Wrapper);
+  // Never use this transformation if constant island pools are disallowed
+  if (!Subtarget->useConstIslands()) return false;
+
+  // explain why we do not want to use this for TargetGlobalAddress
+  if (N.getOperand(0).getOpcode() != ISD::TargetGlobalAddress) return true;
+  return false;
+}
+// @LOCALMOD-END
 
 bool ARMDAGToDAGISel::SelectAddrModeImm12(SDValue N,
                                           SDValue &Base,
@@ -675,6 +687,7 @@ bool ARMDAGToDAGISel::SelectAddrModeImm12(SDValue N,
     }
 
     if (N.getOpcode() == ARMISD::Wrapper &&
+        ShouldOperandBeUnwrappedForUseAsBaseAddress(N, Subtarget) && //@LOCALMOD
         N.getOperand(0).getOpcode() != ISD::TargetGlobalAddress &&
         N.getOperand(0).getOpcode() != ISD::TargetExternalSymbol &&
         N.getOperand(0).getOpcode() != ISD::TargetGlobalTLSAddress) {
@@ -989,6 +1002,8 @@ bool ARMDAGToDAGISel::IsAddressingMode5(SDValue N, SDValue &Base, SDValue &Offse
       Base = CurDAG->getTargetFrameIndex(
           FI, TLI->getPointerTy(CurDAG->getDataLayout()));
     } else if (N.getOpcode() == ARMISD::Wrapper &&
+               // @LOCALMOD
+               ShouldOperandBeUnwrappedForUseAsBaseAddress(N, Subtarget) &&
                N.getOperand(0).getOpcode() != ISD::TargetGlobalAddress &&
                N.getOperand(0).getOpcode() != ISD::TargetExternalSymbol &&
                N.getOperand(0).getOpcode() != ISD::TargetGlobalTLSAddress) {
@@ -3687,7 +3702,8 @@ void ARMDAGToDAGISel::Select(SDNode *N) {
   case ISD::Constant: {
     unsigned Val = cast<ConstantSDNode>(N)->getZExtValue();
     // If we can't materialize the constant we need to use a literal pool
-    if (ConstantMaterializationCost(Val, Subtarget) > 2) {
+    if (ConstantMaterializationCost(Val, Subtarget) > 2
+        && Subtarget->useConstIslands()) { // @LOCALMOD
       SDValue CPIdx = CurDAG->getTargetConstantPool(
           ConstantInt::get(Type::getInt32Ty(*CurDAG->getContext()), Val),
           TLI->getPointerTy(CurDAG->getDataLayout()));
