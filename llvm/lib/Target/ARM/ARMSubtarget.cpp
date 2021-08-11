@@ -215,6 +215,8 @@ void ARMSubtarget::initSubtargetFeatures(StringRef CPU, StringRef FS) {
     ReserveR9 = true;
     // CLREX does not validate.
     HasV7Clrex = false;
+    // Constant Islands are not supported.
+    UseConstIslands = false;
   }
   // @LOCALMOD-END
 
