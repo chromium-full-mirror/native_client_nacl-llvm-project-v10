@@ -988,6 +988,10 @@ static MachineOperand getMovOperand(const MachineOperand &MO,
     return MachineOperand::CreateES(MO.getSymbolName(), TF);
   case MachineOperand::MO_JumpTableIndex:
     return MachineOperand::CreateJTI(MO.getIndex(), TF);
+  // @LOCALMOD-START
+  case MachineOperand::MO_ConstantPoolIndex:
+    return MachineOperand::CreateCPI(MO.getIndex(), MO.getOffset(), TF);
+  // @LOCALMOD-END
   default:
     return MachineOperand::CreateGA(MO.getGlobal(), MO.getOffset(), TF);
   }
@@ -2724,6 +2728,7 @@ bool ARMExpandPseudo::ExpandMI(MachineBasicBlock &MBB,
     }
 
     case ARM::MOVi32imm:
+    case ARM::MOVti32imm: // @LOCALMOD
     case ARM::MOVCCi32imm:
     case ARM::t2MOVi32imm:
     case ARM::t2MOVCCi32imm:

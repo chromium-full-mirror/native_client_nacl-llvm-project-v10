@@ -436,6 +436,11 @@ unsigned ARMFastISel::ARMMaterializeFP(const ConstantFP *CFP, MVT VT) {
   // Require VFP2 for loading fp constants.
   if (!Subtarget->hasVFP2Base()) return false;
 
+  // @LOCALMOD-START
+  if (!Subtarget->useConstIslands())
+    return false;
+  // @LOCALMOD-END
+
   // MachineConstantPool wants an explicit alignment.
   Align Alignment = DL.getPrefTypeAlign(CFP->getType());
   unsigned Idx = MCP.getConstantPoolIndex(cast<Constant>(CFP), Alignment);
@@ -491,6 +496,11 @@ unsigned ARMFastISel::ARMMaterializeInt(const Constant *C, MVT VT) {
 
   if (ResultReg)
     return ResultReg;
+
+  // @LOCALMOD-START
+  // Should have been handled by fastEmit_i above.
+  assert(Subtarget->useConstIslands());
+  // @LOCALMOD-END
 
   // Load from constant pool.  For now 32-bit only.
   if (VT != MVT::i32)
@@ -554,6 +564,10 @@ unsigned ARMFastISel::ARMMaterializeGV(const GlobalValue *GV, MVT VT) {
     AddOptionalDefs(BuildMI(*FuncInfo.MBB, FuncInfo.InsertPt, MIMD,
                             TII.get(Opc), DestReg).addGlobalAddress(GV, 0, TF));
   } else {
+    // @LOCALMOD-BEGIN
+    if (!Subtarget->useConstIslands())
+      return 0;
+    // @LOCALMOD-END
     // MachineConstantPool wants an explicit alignment.
     Align Alignment = DL.getPrefTypeAlign(GV->getType());
 
