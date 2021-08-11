@@ -571,7 +571,10 @@ void ARMPassConfig::addPreEmitPass() {
 }
 
 void ARMPassConfig::addPreEmitPass2() {
-  addPass(createARMConstantIslandPass());
+  // @LOCALMOD-START
+  if (!TM->getTargetTriple().isOSNaCl())
+    addPass(createARMConstantIslandPass());
+  // @LOCALMOD-END
   addPass(createARMLowOverheadLoopsPass());
 
   if (TM->getTargetTriple().isOSWindows()) {
