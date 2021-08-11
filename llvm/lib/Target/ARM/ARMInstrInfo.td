@@ -5967,6 +5967,17 @@ def MOVi32imm : PseudoInst<(outs GPR:$dst), (ins i32imm:$src), IIC_iMOVix2,
                            [(set GPR:$dst, (arm_i32imm:$src))]>,
                            Requires<[IsARM]>;
 
+// @LOCALMOD-START
+// MOVi32imm doesn't get a fast-isel because it's not a leaf pattern (it uses
+// arm_i32imm which differs based on whether UseMovt is true.) This means
+// ARMFastISel::ARMMaterializeInt fails when useConstIslands is disabled, and
+// ARMFastISel::ARMSimplifyAddress can't bail out of fast isel.
+let isReMaterializable = 1, isMoveImm = 1, hasNoSchedulingInfo = 1 in
+def MOVti32imm : PseudoInst<(outs GPR:$dst), (ins i32imm:$src), IIC_iMOVix2,
+                           [(set GPR:$dst, (i32 imm:$src))]>,
+                           Requires<[IsARM, DontUseConstIslands]>;
+// @LOCALMOD-END
+
 def LDRLIT_ga_abs : PseudoInst<(outs GPR:$dst), (ins i32imm:$src), IIC_iLoad_i,
                                [(set GPR:$dst, (ARMWrapper tglobaladdr:$src))]>,
                     Requires<[IsARM, DontUseMovt]>;
@@ -6023,9 +6034,14 @@ def : Pat<(load (ARMWrapperPIC tglobaltlsaddr:$addr)),
 
 
 // ConstantPool, GlobalAddress, and JumpTable
-def : ARMPat<(ARMWrapper  tconstpool  :$dst), (LEApcrel tconstpool  :$dst)>;
+def : ARMPat<(ARMWrapper  tconstpool  :$dst), (LEApcrel tconstpool  :$dst)>,
+            Requires<[IsARM, UseConstIslands]>; // @LOCALMOD
 def : ARMPat<(ARMWrapper  tglobaladdr :$dst), (MOVi32imm tglobaladdr :$dst)>,
             Requires<[IsARM, UseMovt]>;
+// @LOCALMOD-START
+def : ARMPat<(ARMWrapper  tconstpool :$dst), (MOVi32imm tconstpool :$dst)>,
+            Requires<[IsARM, UseMovt, DontUseConstIslands]>;
+// @LOCALMOD-END
 def : ARMPat<(ARMWrapper texternalsym :$dst), (MOVi32imm texternalsym :$dst)>,
             Requires<[IsARM, UseMovt]>;
 def : ARMPat<(ARMWrapperJT tjumptable:$dst),

@@ -1059,10 +1059,25 @@ void ARMExpandPseudo::ExpandMOV32BitImm(MachineBasicBlock &MBB,
     break;
   }
   default: {
-    const GlobalValue *GV = MO.getGlobal();
-    unsigned TF = MO.getTargetFlags();
-    LO16 = LO16.addGlobalAddress(GV, MO.getOffset(), TF | ARMII::MO_LO16);
-    HI16 = HI16.addGlobalAddress(GV, MO.getOffset(), TF | ARMII::MO_HI16);
+    if (MO.isGlobal()) { // @LOCALMOD
+      const GlobalValue *GV = MO.getGlobal();
+      unsigned TF = MO.getTargetFlags();
+      LO16 = LO16.addGlobalAddress(GV, MO.getOffset(), TF | ARMII::MO_LO16);
+      HI16 = HI16.addGlobalAddress(GV, MO.getOffset(), TF | ARMII::MO_HI16);
+    // @LOCALMOD-START - support for jumptable addresses and CPI
+    } else if (MO.isCPI()) {
+      int i = MO.getIndex();
+      unsigned TF = MO.getTargetFlags();
+      LO16 = LO16.addConstantPoolIndex(i, MO.getOffset(), TF|ARMII::MO_LO16);
+      HI16 = HI16.addConstantPoolIndex(i, MO.getOffset(), TF|ARMII::MO_HI16);
+    } else if (MO.isJTI()){
+      unsigned TF = MO.getTargetFlags();
+      LO16 = LO16.addJumpTableIndex(MO.getIndex(), TF | ARMII::MO_LO16);
+      HI16 = HI16.addJumpTableIndex(MO.getIndex(), TF | ARMII::MO_HI16);
+    } else {
+      assert (0 && "unexpected operand");
+    }
+    // @LOCALMOD-END
     break;
   }
   }
@@ -2632,6 +2647,7 @@ bool ARMExpandPseudo::ExpandMI(MachineBasicBlock &MBB,
     }
 
     case ARM::MOVi32imm:
+    case ARM::MOVti32imm: // @LOCALMOD
     case ARM::MOVCCi32imm:
     case ARM::t2MOVi32imm:
     case ARM::t2MOVCCi32imm:

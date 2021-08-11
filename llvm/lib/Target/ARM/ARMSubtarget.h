@@ -262,6 +262,11 @@ protected:
   /// ReserveR9 - True if R9 is not available as a general purpose register.
   bool ReserveR9 = false;
 
+  // @LOCALMOD-START
+  /// UseConstIslands - True if constant islands should be used.
+  bool UseConstIslands = true;
+  // @LOCALMOD-END
+
   /// NoMovt - True if MOVT / MOVW pairs are not used for materialization of
   /// 32-bit imms (including global addresses).
   bool NoMovt = false;
@@ -839,6 +844,8 @@ public:
   bool isR9Reserved() const {
     return isTargetMachO() ? (ReserveR9 || !HasV6Ops) : ReserveR9;
   }
+
+  bool useConstIslands() const { return UseConstIslands; } // @LOCALMOD
 
   MCPhysReg getFramePointerReg() const {
     if (isTargetDarwin() || (!isTargetWindows() && isThumb()))

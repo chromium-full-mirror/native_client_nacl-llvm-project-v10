@@ -226,3 +226,8 @@ def GenExecuteOnly : Predicate<"Subtarget->genExecuteOnly()">;
 // Armv8.5-A extensions
 def HasSB            : Predicate<"Subtarget->hasSB()">,
                        AssemblerPredicate<(all_of FeatureSB), "sb">;
+
+// @LOCALMOD-BEGIN
+def UseConstIslands : Predicate<"Subtarget->useConstIslands()">;
+def DontUseConstIslands : Predicate<"!Subtarget->useConstIslands()">;
+// @LOCALMOD-END
