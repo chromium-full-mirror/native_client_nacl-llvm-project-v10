@@ -230,3 +230,8 @@ def HasSB            : Predicate<"Subtarget->hasSB()">,
 // Armv8.9-A/9.4-A 2022 Architecture extensions
 def HasCLRBHB        : Predicate<"Subtarget->hasCLRBHB()">,
                        AssemblerPredicate<(all_of FeatureCLRBHB), "clrbhb">;
+
+// @LOCALMOD-BEGIN
+def UseConstIslands : Predicate<"Subtarget->useConstIslands()">;
+def DontUseConstIslands : Predicate<"!Subtarget->useConstIslands()">;
+// @LOCALMOD-END
