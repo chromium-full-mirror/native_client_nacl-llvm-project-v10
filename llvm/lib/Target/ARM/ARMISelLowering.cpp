@@ -3658,6 +3658,51 @@ ARMTargetLowering::LowerToTLSExecModels(GlobalAddressSDNode *GA,
     MachineFunction &MF = DAG.getMachineFunction();
     ARMFunctionInfo *AFI = MF.getInfo<ARMFunctionInfo>();
     unsigned ARMPCLabelIndex = AFI->createPICLabelUId();
+    // @LOCALMOD-BEGIN
+    if (!Subtarget->useConstIslands()) {
+      // With constant islands "disabled" (moved to rodata), this constant pool
+      // entry is no longer in text, and simultaneous PC relativeness
+      // and CP Addr relativeness is no longer expressible.
+      // So, instead of having:
+      //
+      // .LCPI12_0:
+      //   .long var(tlsgd)-((.LPC12_0+8) - .)
+      // ...
+      //    ldr r2, .LCPI12_0
+      // .LPC12_0:
+      //    add r0, pc, r2
+      //
+      // we have:
+      //
+      // .LCPI12_0:
+      //   .long var(tlsgd)
+      // ...
+      //    // get addr of .LCPI12_0 into r2
+      //    ldr r0, [r2]
+      //    add r0, r2, r0
+      // (1) No longer subtracting pc, so no longer adding that back
+      // (2) Not adding "." in the CP entry, so adding it via instructions.
+      // This example was originally written for tlsgd, but it also applies to
+      // the local exec model.
+      unsigned char PCAdj = 0;
+      ARMConstantPoolValue *CPV =
+        ARMConstantPoolConstant::Create(GA->getGlobal(), ARMPCLabelIndex,
+                                        ARMCP::CPValue, PCAdj, ARMCP::GOTTPOFF,
+                                        false);
+      SDValue CPAddr = DAG.getTargetConstantPool(CPV, PtrVT, Align(4));
+      CPAddr = DAG.getNode(ARMISD::Wrapper, dl, MVT::i32, CPAddr);
+      Offset = DAG.getLoad(
+        PtrVT, dl, Chain, CPAddr,
+        MachinePointerInfo::getConstantPool(DAG.getMachineFunction()));
+      Chain = Offset.getValue(1);
+      Offset = DAG.getNode(ISD::ADD, dl, PtrVT, Offset, CPAddr);
+      Offset = DAG.getLoad(
+          PtrVT, dl, Chain, Offset,
+          MachinePointerInfo::getConstantPool(DAG.getMachineFunction()));
+
+      return DAG.getNode(ISD::ADD, dl, PtrVT, ThreadPointer, Offset);
+    }
+    // @LOCALMOD-END
     // Initial exec model.
     unsigned char PCAdj = Subtarget->isThumb() ? 4 : 8;
     ARMConstantPoolValue *CPV =

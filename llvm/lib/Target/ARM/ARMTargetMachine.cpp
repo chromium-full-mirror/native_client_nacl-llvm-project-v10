@@ -424,7 +424,7 @@ void ARMPassConfig::addIRPasses() {
   TargetPassConfig::addIRPasses();
 
   // Run the parallel DSP pass.
-  if (getOptLevel() == CodeGenOpt::Aggressive) 
+  if (getOptLevel() == CodeGenOpt::Aggressive)
     addPass(createARMParallelDSPPass());
 
   // Match interleaved memory accesses to ldN/stN intrinsics.
@@ -577,7 +577,10 @@ void ARMPassConfig::addPreEmitPass() {
 
 void ARMPassConfig::addPreEmitPass2() {
   addPass(createARMBranchTargetsPass());
-  addPass(createARMConstantIslandPass());
+  // @LOCALMOD-START
+  if (!TM->getTargetTriple().isOSNaCl())
+    addPass(createARMConstantIslandPass());
+  // @LOCALMOD-END
   addPass(createARMLowOverheadLoopsPass());
 
   if (TM->getTargetTriple().isOSWindows()) {
