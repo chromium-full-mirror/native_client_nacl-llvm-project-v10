@@ -1731,6 +1731,14 @@ void Clang::AddARMTargetArgs(const llvm::Triple &Triple, const ArgList &Args,
       CmdArgs.push_back("-arm-global-merge=true");
   }
 
+  // @LOCALMOD-START
+  const llvm::Triple T = getToolChain().getTriple();
+  if (T.isOSNaCl()) {
+      CmdArgs.push_back("-mllvm");
+      CmdArgs.push_back("-align-all-functions=4");
+  }
+  // @LOCALMOD-END
+
   if (!Args.hasFlag(options::OPT_mimplicit_float,
                     options::OPT_mno_implicit_float, true))
     CmdArgs.push_back("-no-implicit-float");
@@ -2311,15 +2319,10 @@ void Clang::AddX86TargetArgs(const ArgList &Args,
   // @LOCALMOD-BEGIN
   const llvm::Triple T = getToolChain().getTriple();
   if (T.isOSNaCl()) {
-    if (T.isARM()) {
-      CmdArgs.push_back("-mllvm");
-      CmdArgs.push_back("-align-all-functions=4");
-    } else if (T.isX86()) {
-      CmdArgs.push_back("-mllvm");
-      CmdArgs.push_back("-align-all-functions=5");
-      CmdArgs.push_back("-mllvm");
-      CmdArgs.push_back("-x86-disallow-bt=true");
-    }
+    CmdArgs.push_back("-mllvm");
+    CmdArgs.push_back("-align-all-functions=5");
+    CmdArgs.push_back("-mllvm");
+    CmdArgs.push_back("-x86-disallow-bt=true");
   }
   // @LOCALMOD-END
 }
