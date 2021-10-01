@@ -491,7 +491,7 @@ static bool ExecuteAssemblerImpl(AssemblerInvocation &Opts,
         T, Ctx, std::move(MAB), std::move(OW), std::move(CE), *STI,
         Opts.RelaxAll, Opts.IncrementalLinkerCompatible,
         /*DWARFMustBeAtTheEnd*/ true));
-    Str.get()->InitSections(Opts.NoExecStack, *STI);
+    Str.get()->initSections(Opts.NoExecStack, *STI);
     // @LOCALMOD-BEGIN
     if (T.isOSNaCl())
       initializeNaClMCStreamer(*Str.get(), Ctx, T);
