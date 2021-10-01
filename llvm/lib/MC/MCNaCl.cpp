@@ -84,8 +84,9 @@ void initializeNaClMCStreamer(MCStreamer &Streamer, MCContext &Ctx,
 
   // Emit an ELF Note section in its own COMDAT group which identifies NaCl
   // object files to the gold linker, so it can use the NaCl layout.
-  MCSectionELF* Note = Ctx.getELFSection(
-      NoteName, ELF::SHT_NOTE, ELF::SHF_ALLOC | ELF::SHF_GROUP, 0, NoteName);
+  MCSectionELF* Note = Ctx.getELFSection(NoteName, ELF::SHT_NOTE,
+                                         ELF::SHF_ALLOC | ELF::SHF_GROUP,
+                                         0, NoteName, /*IsComdat=*/true);
 
   Streamer.PushSection();
   Streamer.SwitchSection(Note);
