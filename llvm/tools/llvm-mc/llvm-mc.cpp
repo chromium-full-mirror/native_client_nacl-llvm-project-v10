@@ -552,7 +552,7 @@ int main(int argc, char **argv) {
     // @LOCALMOD-START
     Triple T(TripleName);
     if (T.isOSNaCl()) {
-      Str->InitSections(NoExecStack);
+      Str->initSections(NoExecStack, *STI);
       initializeNaClMCStreamer(*Str.get(), Ctx, T);
     }
     // @LOCALMOD-END
@@ -577,14 +577,14 @@ int main(int argc, char **argv) {
         MCOptions.MCIncrementalLinkerCompatible,
         /*DWARFMustBeAtTheEnd*/ false));
     if (NoExecStack)
-      Str->InitSections(true, *STI);
+      Str->initSections(true, *STI);
 
     // @LOCALMOD-BEGIN
     Triple T(TripleName);
     if (T.isOSNaCl()) {
       // If the above non-localmod does InitSections unconditionally,
       // we can use that.
-      Str->InitSections(NoExecStack, *STI);
+      Str->initSections(NoExecStack, *STI);
       initializeNaClMCStreamer(*Str.get(), Ctx, T);
     }
     // @LOCALMOD-END
