@@ -554,7 +554,7 @@ int main(int argc, char **argv) {
     // @LOCALMOD-START
     Triple T(TripleName);
     if (T.isOSNaCl()) {
-      Str->InitSections(NoExecStack);
+      Str->initSections(NoExecStack, *STI);
       initializeNaClMCStreamer(*Str.get(), Ctx, T);
     }
     // @LOCALMOD-END
@@ -578,6 +578,7 @@ int main(int argc, char **argv) {
         std::unique_ptr<MCCodeEmitter>(CE), *STI));
     if (NoExecStack)
       Str->switchSection(Ctx.getAsmInfo()->getNonexecutableStackSection(Ctx));
+
     // @LOCALMOD-BEGIN
     Triple T(TripleName);
     if (T.isOSNaCl()) {
