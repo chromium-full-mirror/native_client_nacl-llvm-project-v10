@@ -1043,7 +1043,8 @@ __sanitizer_verify_double_ended_contiguous_container(const void*, const void*, c
         defined(__GNU__) ||                                                                                            \
         defined(__APPLE__) ||                                                                                          \
         defined(__MVS__) ||                                                                                            \
-        defined(_AIX) ||                                                                                               \
+        defined(_AIX) ||                                                                                            \
+        defined(__native_client__) || /* @LOCALMOD */                                                                  \
         defined(__EMSCRIPTEN__)
 // clang-format on
 #      define _LIBCPP_HAS_THREAD_API_PTHREAD
