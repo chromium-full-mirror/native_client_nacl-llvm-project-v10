@@ -693,9 +693,11 @@ if (LLVM_BUILD_STATIC)
 endif()
 
 # Use libtool instead of ar if you are both on an Apple host, and targeting Apple.
-if(CMAKE_HOST_APPLE AND APPLE)
-  include(UseLibtool)
-endif()
+# @LOCALMOD-START - Don't use libtool for NaCl
+# if(CMAKE_HOST_APPLE AND APPLE)
+#   include(UseLibtool)
+# endif()
+# @LOCALMOD-END
 
 # Override the default target with an environment variable named by LLVM_TARGET_TRIPLE_ENV.
 set(LLVM_TARGET_TRIPLE_ENV CACHE STRING "The name of environment variable to override default target. Disabled by blank.")

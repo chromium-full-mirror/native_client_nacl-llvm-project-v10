@@ -375,7 +375,9 @@ int main() { return 0;}
 
 
 # Define LLVM_HAS_ATOMICS if gcc or MSVC atomic builtins are supported.
-include(CheckAtomic)
+if (NOT CMAKE_SYSTEM_NAME STREQUAL "nacl") # @LOCALMOD
+  include(CheckAtomic)
+endif() # @LOCALMOD
 
 if( LLVM_ENABLE_PIC )
   set(ENABLE_PIC 1)

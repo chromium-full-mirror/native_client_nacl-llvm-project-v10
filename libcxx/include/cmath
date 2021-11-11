@@ -234,11 +234,15 @@ long double    log1pl(long double x);
 
 floating_point log2 (arithmetic x);
 float          log2f(float x);
+#if !defined(_NEWLIB_VERSION) // @LOCALMOD-START Missing from newlib.
 long double    log2l(long double x);
+#endif @LOCALMOD-END
 
 floating_point logb (arithmetic x);
 float          logbf(float x);
+#if !defined(_NEWLIB_VERSION) // @LOCALMOD-START Missing from newlib.
 long double    logbl(long double x);
+#endif // @LOCALMOD-END
 
 long lrint (arithmetic x);
 long lrintf(float x);
@@ -261,8 +265,10 @@ float          nextafterf(float x, float y);
 long double    nextafterl(long double x, long double y);
 
 floating_point nexttoward (arithmetic x, long double y);
+#if !defined(_NEWLIB_VERSION) // @LOCALMOD-START Missing from newlib.
 float          nexttowardf(float x, long double y);
 long double    nexttowardl(long double x, long double y);
+#endif // @LOCALMOD-END
 
 floating_point remainder (arithmetic x, arithmetic y);
 float          remainderf(float x, float y);
@@ -449,7 +455,9 @@ using ::nearbyintf _LIBCPP_USING_IF_EXISTS;
 using ::nextafter _LIBCPP_USING_IF_EXISTS;
 using ::nextafterf _LIBCPP_USING_IF_EXISTS;
 using ::nexttoward _LIBCPP_USING_IF_EXISTS;
+#if !defined(_NEWLIB_VERSION) // @LOCALMOD-START Missing from newlib.
 using ::nexttowardf _LIBCPP_USING_IF_EXISTS;
+#endif // @LOCALMOD-END
 using ::remainder _LIBCPP_USING_IF_EXISTS;
 using ::remainderf _LIBCPP_USING_IF_EXISTS;
 using ::remquo _LIBCPP_USING_IF_EXISTS;
@@ -511,14 +519,18 @@ using ::lgammal _LIBCPP_USING_IF_EXISTS;
 using ::llrintl _LIBCPP_USING_IF_EXISTS;
 using ::llroundl _LIBCPP_USING_IF_EXISTS;
 using ::log1pl _LIBCPP_USING_IF_EXISTS;
+#if !defined(_NEWLIB_VERSION) // @LOCALMOD-START Missing from newlib.
 using ::log2l _LIBCPP_USING_IF_EXISTS;
 using ::logbl _LIBCPP_USING_IF_EXISTS;
+#endif // @LOCALMOD-END
 using ::lrintl _LIBCPP_USING_IF_EXISTS;
 using ::lroundl _LIBCPP_USING_IF_EXISTS;
 using ::nanl _LIBCPP_USING_IF_EXISTS;
 using ::nearbyintl _LIBCPP_USING_IF_EXISTS;
 using ::nextafterl _LIBCPP_USING_IF_EXISTS;
+#if !defined(_NEWLIB_VERSION) // @LOCALMOD-START Missing from newlib.
 using ::nexttowardl _LIBCPP_USING_IF_EXISTS;
+#endif // @LOCALMOD-END
 using ::remainderl _LIBCPP_USING_IF_EXISTS;
 using ::remquol _LIBCPP_USING_IF_EXISTS;
 using ::rintl _LIBCPP_USING_IF_EXISTS;
