@@ -284,8 +284,10 @@ if (LIBCXXABI_ENABLE_STATIC)
   endif()
   set_target_properties(cxxabi_static
     PROPERTIES
+      CXX_EXTENSIONS ON # @LOCALMOD
       LINK_FLAGS "${LIBCXXABI_LINK_FLAGS}"
       OUTPUT_NAME "${LIBCXXABI_STATIC_OUTPUT_NAME}"
+      POSITION_INDEPENDENT_CODE OFF # @LOCALMOD
     )
   target_link_libraries(cxxabi_static
     PUBLIC cxxabi_static_objects
