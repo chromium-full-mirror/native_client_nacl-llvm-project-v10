@@ -21,6 +21,10 @@
 // where strerror/strerror_r can't handle out-of-range errno values.
 #if defined(ELAST)
 #define _LIBCPP_ELAST ELAST
+// @LOCALMOD-START
+#elif defined(__native_client__)
+// NaCl doesn't have ELAST or __ELASTERROR
+// @LOCALMOD-END
 #elif defined(_NEWLIB_VERSION)
 #define _LIBCPP_ELAST __ELASTERROR
 #elif defined(__NuttX__)
