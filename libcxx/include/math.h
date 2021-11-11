@@ -1456,7 +1456,13 @@ log1p(_A1 __x) _NOEXCEPT {return ::log1p((double)__x);}
 // log2
 
 inline _LIBCPP_HIDE_FROM_ABI float       log2(float __x) _NOEXCEPT       {return ::log2f(__x);}
+#if defined(_NEWLIB_VERSION) // @LOCALMOD-START
+// Missing from newlib. Note that NaCl represents ``long double`` as
+// ``double``, hence the intrinsic's type.
+inline _LIBCPP_HIDE_FROM_ABI long double log2(long double __x) _NOEXCEPT {return __builtin_log2(__x);} // TODO(fabiansommer): does this need the :: ?
+#else
 inline _LIBCPP_HIDE_FROM_ABI long double log2(long double __x) _NOEXCEPT {return ::log2l(__x);}
+#endif // @LOCALMOD-END
 
 template <class _A1>
 inline _LIBCPP_HIDE_FROM_ABI
@@ -1466,7 +1472,13 @@ log2(_A1 __x) _NOEXCEPT {return ::log2((double)__x);}
 // logb
 
 inline _LIBCPP_HIDE_FROM_ABI float       logb(float __x) _NOEXCEPT       {return ::logbf(__x);}
+#if defined(_NEWLIB_VERSION) // @LOCALMOD-START
+// Missing from newlib. Note that NaCl represents ``long double`` as
+// ``double``, hence the intrinsic's type.
+inline _LIBCPP_HIDE_FROM_ABI long double logb(long double __x) _NOEXCEPT {return __builtin_logb(__x);}
+#else
 inline _LIBCPP_HIDE_FROM_ABI long double logb(long double __x) _NOEXCEPT {return ::logbl(__x);}
+#endif // @LOCALMOD-END
 
 template <class _A1>
 inline _LIBCPP_HIDE_FROM_ABI
@@ -1570,6 +1582,17 @@ nextafter(_A1 __x, _A2 __y) _NOEXCEPT
 
 // nexttoward
 
+#if defined(_NEWLIB_VERSION) // @LOCALMOD-START
+// Missing from newlib. Note that NaCl represents ``long double`` as
+// ``double``, hence the intrinsic's type.
+inline _LIBCPP_HIDE_FROM_ABI float       nexttoward(float __x, long double __y) _NOEXCEPT       {return __builtin_nexttoward(__x, __y);}
+inline _LIBCPP_HIDE_FROM_ABI long double nexttoward(long double __x, long double __y) _NOEXCEPT {return __builtin_nexttoward(__x, __y);}
+
+template <class _A1>
+inline _LIBCPP_HIDE_FROM_ABI
+typename std::enable_if<std::is_integral<_A1>::value, double>::type
+nexttoward(_A1 __x, long double __y) _NOEXCEPT {return __builtin_nexttoward((double)__x, __y);}
+#else
 inline _LIBCPP_HIDE_FROM_ABI float       nexttoward(float __x, long double __y) _NOEXCEPT       {return ::nexttowardf(__x, __y);}
 inline _LIBCPP_HIDE_FROM_ABI long double nexttoward(long double __x, long double __y) _NOEXCEPT {return ::nexttowardl(__x, __y);}
 
@@ -1577,6 +1600,7 @@ template <class _A1>
 inline _LIBCPP_HIDE_FROM_ABI
 typename std::enable_if<std::is_integral<_A1>::value, double>::type
 nexttoward(_A1 __x, long double __y) _NOEXCEPT {return ::nexttoward((double)__x, __y);}
+#endif // @LOCALMOD-END
 
 // remainder
 
