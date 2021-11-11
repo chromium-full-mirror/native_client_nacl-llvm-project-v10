@@ -238,12 +238,13 @@ if (LIBCXXABI_ENABLE_STATIC)
   endif()
   set_target_properties(cxxabi_static
     PROPERTIES
-      CXX_EXTENSIONS OFF
+      CXX_EXTENSIONS ON # @LOCALMOD
       CXX_STANDARD 20
       CXX_STANDARD_REQUIRED OFF
       COMPILE_FLAGS "${LIBCXXABI_COMPILE_FLAGS}"
       LINK_FLAGS "${LIBCXXABI_LINK_FLAGS}"
       OUTPUT_NAME "c++abi"
+      POSITION_INDEPENDENT_CODE OFF # @LOCALMOD
     )
 
   if(LIBCXXABI_HERMETIC_STATIC_LIBRARY)
@@ -266,9 +267,11 @@ if (LIBCXXABI_ENABLE_STATIC)
     list(APPEND LIBCXXABI_INSTALL_TARGETS "cxxabi_static")
   endif()
 
-  if (APPLE)
-    set(MERGE_ARCHIVES_LIBTOOL "--use-libtool" "--libtool" "${CMAKE_LIBTOOL}")
-  endif()
+# @LOCALMOD-START - libtool complains that object files are not valid
+#  if (APPLE)
+#    set(MERGE_ARCHIVES_LIBTOOL "--use-libtool" "--libtool" "${CMAKE_LIBTOOL}")
+#  endif()
+# @LOCALMOD-END
 
   # Merge the libc++abi.a and libunwind.a into one.
   if(LIBCXXABI_USE_LLVM_UNWINDER AND LIBCXXABI_STATICALLY_LINK_UNWINDER_IN_STATIC_LIBRARY)
