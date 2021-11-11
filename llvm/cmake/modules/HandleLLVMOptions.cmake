@@ -148,7 +148,9 @@ else(WIN32)
       set(LLVM_HAVE_LINK_VERSION_SCRIPT 1)
     endif()
   else(FUCHSIA OR UNIX)
-    MESSAGE(SEND_ERROR "Unable to determine platform")
+    if (NOT CMAKE_SYSTEM_NAME STREQUAL "nacl") # @LOCALMOD
+      MESSAGE(SEND_ERROR "Unable to determine platform")
+    endif() # @LOCALMOD
   endif(FUCHSIA OR UNIX)
 endif(WIN32)
 

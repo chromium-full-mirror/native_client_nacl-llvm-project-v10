@@ -1455,7 +1455,13 @@ log1p(_A1 __lcpp_x) _NOEXCEPT {return ::log1p((double)__lcpp_x);}
 // log2
 
 inline _LIBCPP_INLINE_VISIBILITY float       log2(float __lcpp_x) _NOEXCEPT       {return ::log2f(__lcpp_x);}
+#if defined(_NEWLIB_VERSION) // @LOCALMOD-START
+// Missing from newlib. Note that NaCl represents ``long double`` as
+// ``double``, hence the intrinsic's type.
+inline _LIBCPP_INLINE_VISIBILITY long double log2(long double __lcpp_x) _NOEXCEPT {return __builtin_log2(__lcpp_x);} // TODO(fabiansommer): does this need the :: ?
+#else
 inline _LIBCPP_INLINE_VISIBILITY long double log2(long double __lcpp_x) _NOEXCEPT {return ::log2l(__lcpp_x);}
+#endif // @LOCALMOD-END
 
 template <class _A1>
 inline _LIBCPP_INLINE_VISIBILITY
@@ -1465,7 +1471,13 @@ log2(_A1 __lcpp_x) _NOEXCEPT {return ::log2((double)__lcpp_x);}
 // logb
 
 inline _LIBCPP_INLINE_VISIBILITY float       logb(float __lcpp_x) _NOEXCEPT       {return ::logbf(__lcpp_x);}
+#if defined(_NEWLIB_VERSION) // @LOCALMOD-START
+// Missing from newlib. Note that NaCl represents ``long double`` as
+// ``double``, hence the intrinsic's type.
+inline _LIBCPP_INLINE_VISIBILITY long double logb(long double __lcpp_x) _NOEXCEPT {return __builtin_logb(__lcpp_x);}
+#else
 inline _LIBCPP_INLINE_VISIBILITY long double logb(long double __lcpp_x) _NOEXCEPT {return ::logbl(__lcpp_x);}
+#endif // @LOCALMOD-END
 
 template <class _A1>
 inline _LIBCPP_INLINE_VISIBILITY
@@ -1569,6 +1581,17 @@ nextafter(_A1 __lcpp_x, _A2 __lcpp_y) _NOEXCEPT
 
 // nexttoward
 
+#if defined(_NEWLIB_VERSION) // @LOCALMOD-START
+// Missing from newlib. Note that NaCl represents ``long double`` as
+// ``double``, hence the intrinsic's type.
+inline _LIBCPP_INLINE_VISIBILITY float       nexttoward(float __lcpp_x, long double __lcpp_y) _NOEXCEPT       {return __builtin_nexttoward(__lcpp_x, __lcpp_y);}
+inline _LIBCPP_INLINE_VISIBILITY long double nexttoward(long double __lcpp_x, long double __lcpp_y) _NOEXCEPT {return __builtin_nexttoward(__lcpp_x, __lcpp_y);}
+
+template <class _A1>
+inline _LIBCPP_INLINE_VISIBILITY
+typename std::enable_if<std::is_integral<_A1>::value, double>::type
+nexttoward(_A1 __lcpp_x, long double __lcpp_y) _NOEXCEPT {return __builtin_nexttoward((double)__lcpp_x, __lcpp_y);}
+#else
 inline _LIBCPP_INLINE_VISIBILITY float       nexttoward(float __lcpp_x, long double __lcpp_y) _NOEXCEPT       {return ::nexttowardf(__lcpp_x, __lcpp_y);}
 inline _LIBCPP_INLINE_VISIBILITY long double nexttoward(long double __lcpp_x, long double __lcpp_y) _NOEXCEPT {return ::nexttowardl(__lcpp_x, __lcpp_y);}
 
@@ -1576,6 +1599,7 @@ template <class _A1>
 inline _LIBCPP_INLINE_VISIBILITY
 typename std::enable_if<std::is_integral<_A1>::value, double>::type
 nexttoward(_A1 __lcpp_x, long double __lcpp_y) _NOEXCEPT {return ::nexttoward((double)__lcpp_x, __lcpp_y);}
+#endif // @LOCALMOD-END
 
 // remainder
 

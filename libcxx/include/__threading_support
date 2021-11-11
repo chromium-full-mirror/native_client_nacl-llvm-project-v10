@@ -477,9 +477,8 @@ bool __libcpp_semaphore_wait(__libcpp_semaphore_t* __sem)
 
 bool __libcpp_semaphore_wait_timed(__libcpp_semaphore_t* __sem, chrono::nanoseconds const& __ns)
 {
-    auto const __abs_time = chrono::system_clock::now().time_since_epoch() + __ns;
-    __libcpp_timespec_t __ts = __thread_detail::__convert_to_timespec(__abs_time);
-    return sem_timedwait(__sem, &__ts) == 0;
+    // @LOCALMOD - NaCl does not implement sem_timedwait.
+    return false;
 }
 
 #endif //_LIBCPP_NO_NATIVE_SEMAPHORES
