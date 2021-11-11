@@ -23,6 +23,10 @@
 #  define _LIBCPP_ELAST ELAST
 #elif defined(__LLVM_LIBC__)
 // No _LIBCPP_ELAST needed for LLVM libc
+// @LOCALMOD-START
+#elif defined(__native_client__)
+// NaCl doesn't have ELAST or __ELASTERROR
+// @LOCALMOD-END
 #elif defined(_NEWLIB_VERSION)
 #  define _LIBCPP_ELAST __ELASTERROR
 #elif defined(__NuttX__)

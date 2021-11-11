@@ -304,6 +304,7 @@ set_target_properties(cxxabi_static
     EXCLUDE_FROM_ALL "$<IF:$<BOOL:${LIBCXXABI_ENABLE_STATIC}>,FALSE,TRUE>"
     LINK_FLAGS "${LIBCXXABI_LINK_FLAGS}"
     OUTPUT_NAME "${LIBCXXABI_STATIC_OUTPUT_NAME}"
+    POSITION_INDEPENDENT_CODE OFF # @LOCALMOD
   )
 target_link_libraries(cxxabi_static
   PUBLIC cxxabi_static_objects
