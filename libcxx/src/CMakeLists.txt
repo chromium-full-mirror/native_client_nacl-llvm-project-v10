@@ -276,6 +276,7 @@ set_target_properties(cxx_static
     COMPILE_FLAGS "${LIBCXX_COMPILE_FLAGS}"
     LINK_FLAGS    "${LIBCXX_LINK_FLAGS}"
     OUTPUT_NAME   "${LIBCXX_STATIC_OUTPUT_NAME}"
+    POSITION_INDEPENDENT_CODE OFF # @LOCALMOD
 )
 cxx_add_common_build_flags(cxx_static)
 
