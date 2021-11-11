@@ -931,7 +931,8 @@ _LIBCPP_BEGIN_NAMESPACE_STD _LIBCPP_END_NAMESPACE_STD
         defined(__APPLE__) ||                                                                                          \
         defined(__sun__) ||                                                                                            \
         defined(__MVS__) ||                                                                                            \
-        defined(_AIX) ||                                                                                               \
+        defined(_AIX) ||                                                                                            \
+        defined(__native_client__) || /* @LOCALMOD */                                                                  \
         defined(__EMSCRIPTEN__)
 // clang-format on
 #      define _LIBCPP_HAS_THREAD_API_PTHREAD
