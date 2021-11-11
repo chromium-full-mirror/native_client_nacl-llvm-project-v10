@@ -297,6 +297,7 @@ if (LIBCXX_ENABLE_STATIC)
       COMPILE_FLAGS "${LIBCXX_COMPILE_FLAGS}"
       LINK_FLAGS    "${LIBCXX_LINK_FLAGS}"
       OUTPUT_NAME   "c++"
+      POSITION_INDEPENDENT_CODE OFF # @LOCALMOD
   )
   cxx_add_common_build_flags(cxx_static)
   cxx_set_common_defines(cxx_static)
@@ -335,9 +336,11 @@ if (LIBCXX_ENABLE_STATIC)
         set(MERGE_ARCHIVES_ABI_TARGET "${LIBCXX_CXX_ABI_LIBRARY_PATH}/${MERGE_ARCHIVES_ABI_TARGET}")
       endif ()
     endif()
-    if (APPLE)
-      set(MERGE_ARCHIVES_LIBTOOL "--use-libtool" "--libtool" "${CMAKE_LIBTOOL}")
-    endif()
+    # @LOCALMOD-START - libtool complains that object files are not valid
+    # if (APPLE)
+    #   set(MERGE_ARCHIVES_LIBTOOL "--use-libtool" "--libtool" "${CMAKE_LIBTOOL}")
+    # endif()
+    # @LOCALMOD-END
     add_custom_command(TARGET cxx_static POST_BUILD
     COMMAND
       ${Python3_EXECUTABLE} ${LIBCXX_SOURCE_DIR}/utils/merge_archives.py
