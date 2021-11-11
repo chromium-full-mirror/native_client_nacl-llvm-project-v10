@@ -525,7 +525,7 @@ function(cxx_add_basic_build_flags target)
   set_target_properties(${target} PROPERTIES
     CXX_STANDARD 23
     CXX_STANDARD_REQUIRED OFF # TODO: Make this REQUIRED once we don't need to accommodate the LLVM documentation builders using an ancient CMake
-    CXX_EXTENSIONS NO)
+    CXX_EXTENSIONS YES) # @LOCALMOD
 
   # When building the dylib, don't warn for unavailable aligned allocation
   # functions based on the deployment target -- they are always available
