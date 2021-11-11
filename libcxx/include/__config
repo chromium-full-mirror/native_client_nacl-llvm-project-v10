@@ -840,7 +840,8 @@ typedef __char32_t char32_t;
         defined(__GNU__) ||                                                                                            \
         defined(__APPLE__) ||                                                                                          \
         defined(__MVS__) ||                                                                                            \
-        defined(_AIX) ||                                                                                               \
+        defined(_AIX) ||                                                                                            \
+        defined(__native_client__) || /* @LOCALMOD */                                                                  \
         defined(__EMSCRIPTEN__)
 // clang-format on
 #      define _LIBCPP_HAS_THREAD_API_PTHREAD
