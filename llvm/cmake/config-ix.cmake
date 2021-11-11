@@ -404,7 +404,9 @@ endif()
 check_symbol_exists(proc_pid_rusage "libproc.h" HAVE_PROC_PID_RUSAGE)
 
 # Define LLVM_HAS_ATOMICS if gcc or MSVC atomic builtins are supported.
-include(CheckAtomic)
+if (NOT CMAKE_SYSTEM_NAME STREQUAL "nacl") # @LOCALMOD
+  include(CheckAtomic)
+endif() # @LOCALMOD
 
 if( LLVM_ENABLE_PIC )
   set(ENABLE_PIC 1)
