@@ -154,8 +154,11 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Generic")
   set(LLVM_ON_UNIX 0)
   set(LLVM_HAVE_LINK_VERSION_SCRIPT 0)
 else()
-  MESSAGE(SEND_ERROR "Unable to determine platform")
+  if (NOT CMAKE_SYSTEM_NAME STREQUAL "nacl") # @LOCALMOD
+    MESSAGE(SEND_ERROR "Unable to determine platform")
+  endif() # @LOCALMOD
 endif()
+
 
 if (CMAKE_SYSTEM_NAME MATCHES "OS390")
   set(LLVM_HAVE_LINK_VERSION_SCRIPT 0)
