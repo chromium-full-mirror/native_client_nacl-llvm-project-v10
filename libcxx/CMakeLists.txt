@@ -530,7 +530,7 @@ function(cxx_add_basic_build_flags target)
   set_target_properties(${target} PROPERTIES
     CXX_STANDARD 20
     CXX_STANDARD_REQUIRED YES
-    CXX_EXTENSIONS NO)
+    CXX_EXTENSIONS YES) # @LOCALMOD
 
   # When building the dylib, don't warn for unavailable aligned allocation
   # functions based on the deployment target -- they are always available
