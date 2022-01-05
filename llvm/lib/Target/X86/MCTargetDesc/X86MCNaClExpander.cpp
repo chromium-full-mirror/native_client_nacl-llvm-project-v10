@@ -366,7 +366,7 @@ void X86::X86MCNaClExpander::expandReturn(const MCInst &Inst, MCStreamer &Out,
   Out.emitInstruction(Pop, STI);
 
   if (Inst.getNumOperands() > 0) {
-    if (Inst.getOpcode() == X86::RETIL || Inst.getOpcode() == X86::RETIQ) {
+    if (Inst.getOpcode() == X86::RETI32 || Inst.getOpcode() == X86::RETI64) {
       MCOperand StackPointer =
         MCOperand::createReg(Is64Bit ? X86::RSP : X86::ESP);
 
@@ -377,7 +377,8 @@ void X86::X86MCNaClExpander::expandReturn(const MCInst &Inst, MCStreamer &Out,
       Add.addOperand(Inst.getOperand(0));
 
       doExpandInst(Add, Out, STI, false);
-    } else if (Inst.getOpcode() == X86::RETL || Inst.getOpcode() == X86::RETQ) {
+    } else if (Inst.getOpcode() == X86::RET32 ||
+               Inst.getOpcode() == X86::RET64) {
       LLVM_DEBUG(Inst.dump());
       assert(Inst.getOperand(0).isReg());
       assert(isValidReturnRegister(Inst.getOperand(0).getReg()));
