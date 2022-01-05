@@ -906,6 +906,7 @@ public:
   /// handling standard.
   bool isTargetEHABICompatible() const {
     return (isARM() || isThumb()) &&
+            !isOSNaCl() && // @LOCALMOD
            (getEnvironment() == Triple::EABI ||
             getEnvironment() == Triple::GNUEABI ||
             getEnvironment() == Triple::GNUEABIT64 ||
