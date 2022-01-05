@@ -15,8 +15,8 @@
 #include "llvm/MC/MCNaClExpander.h"
 #include "llvm/MC/MCSectionELF.h"
 #include "llvm/MC/MCStreamer.h"
+#include "llvm/MC/TargetRegistry.h"
 #include "llvm/Support/CommandLine.h"
-#include "llvm/Support/TargetRegistry.h"
 
 static const char NoteNamespace[] = "NaCl";
 
