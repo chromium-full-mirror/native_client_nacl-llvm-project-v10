@@ -22,7 +22,7 @@
 namespace llvm {
 
 void MCNaClExpander::Error(const MCInst &Inst, const char msg[]) {
-  Ctx.reportFatalError(Inst.getLoc(), msg);
+  Ctx.reportError(Inst.getLoc(), msg);
 }
 
 bool MCNaClExpander::addScratchReg(MCRegister Reg) {
