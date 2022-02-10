@@ -59,6 +59,8 @@ public:
   void addClangTargetOptions(const llvm::opt::ArgList &DriverArgs,
                              llvm::opt::ArgStringList &CC1Args,
                              Action::OffloadKind) const override;
+
+  unsigned GetDefaultDwarfVersion() const override { return 4; }
   // @LOCALMOD-END
 
   void addLibCxxIncludePaths(
