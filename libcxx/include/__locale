@@ -503,10 +503,6 @@ public:
     static const mask graph  = alnum | punct;
 
     _LIBCPP_HIDE_FROM_ABI ctype_base() {}
-
-    static_assert((__regex_word & ~(std::make_unsigned<mask>::type)(space | print | cntrl | upper | lower | alpha |
-                                                                    digit | punct | xdigit | blank)) == __regex_word,
-                  "__regex_word can't overlap other bits");
 };
 
 template <class _CharT> class _LIBCPP_TEMPLATE_VIS ctype;
