@@ -471,6 +471,12 @@ def FeatureReserveR9      : SubtargetFeature<"reserve-r9", "ReserveR9", "true",
                                              "Reserve R9, making it unavailable"
                                              " as GPR">;
 
+// @LOCALMOD-START
+def FeatureUseConstIslands : SubtargetFeature<"no-const-islands",
+                                              "UseConstIslands", "false",
+                                              "Don't use constant islands">;
+// @LOCALMOD-END
+
 // True if MOVT / MOVW pairs are not used for materialization of
 // 32-bit imms (including global addresses).
 def FeatureNoMovt         : SubtargetFeature<"no-movt", "NoMovt", "true",
@@ -761,4 +767,3 @@ def FeatureHardenSlsNoComdat : SubtargetFeature<"harden-sls-nocomdat",
 def ModeBigEndianInstructions : SubtargetFeature<"big-endian-instructions",
     "BigEndianInstructions", "true",
      "Expect instructions to be stored big-endian.">;
-
