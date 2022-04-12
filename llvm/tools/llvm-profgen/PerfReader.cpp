@@ -10,6 +10,7 @@
 #include "llvm/DebugInfo/Symbolize/SymbolizableModule.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Process.h"
+#include <cctype> // @LOCALMOD
 
 #define DEBUG_TYPE "perf-reader"
 
