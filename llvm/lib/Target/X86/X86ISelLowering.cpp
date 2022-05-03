@@ -24081,6 +24081,12 @@ static SDValue LowerFGETSIGN(SDValue Op, SelectionDAG &DAG) {
 
 /// Helper for attempting to create a X86ISD::BT node.
 static SDValue getBT(SDValue Src, SDValue BitNo, const SDLoc &DL, SelectionDAG &DAG) {
+  // @LOCALMOD-START
+  // NaCl validator rejects BT, BTS, and BTC.
+  if (X86DisallowBT)
+    return SDValue();
+  // @LOCALMOD-END
+
   // If Src is i8, promote it to i32 with any_extend.  There is no i8 BT
   // instruction.  Since the shift amount is in-range-or-undefined, we know
   // that doing a bittest on the i32 value is ok.  We extend to i32 because
