@@ -323,7 +323,7 @@ void NaClToolChain::addClangTargetOptions(const ArgList &DriverArgs,
                                         ArgStringList &CC1Args,
                                         Action::OffloadKind) const {
   CC1Args.push_back("-fno-jump-tables");
-  CC1Args.push_back("-mdisable-tail-calls");
+  CC1Args.push_back("-fno-optimize-sibling-calls");
 }
 // @LOCALMOD-END
 
