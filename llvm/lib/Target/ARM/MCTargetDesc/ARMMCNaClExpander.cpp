@@ -312,6 +312,12 @@ static unsigned sandboxOpcode(unsigned Opcode) {
   case ARM::LDRH_PRE:
   case ARM::LDRH_POST:
     return ARM::LDRH;
+  case ARM::LDRSB_PRE:
+  case ARM::LDRSB_POST:
+    return ARM::LDRSB;
+  case ARM::LDRSH_PRE:
+  case ARM::LDRSH_POST:
+    return ARM::LDRSH;
   case ARM::LDRB_PRE_IMM:
   case ARM::LDRB_PRE_REG:
   case ARM::LDRB_POST_IMM:
@@ -377,6 +383,8 @@ static void sandboxBaseRegScale(const MCInst &Inst, const MCInstrInfo &II,
     case ARM::STRH:
     case ARM::STRD:
     case ARM::LDRH:
+    case ARM::LDRSH:
+    case ARM::LDRSB:
     case ARM::LDRD:
       SandboxedInst.addOperand(MCOperand::createReg(ARM::NoRegister));
     }
@@ -423,6 +431,7 @@ void ARM::ARMMCNaClExpander::expandPrefetch(const MCInst &Inst, MCStreamer &Out,
 
 // These can use reg + imm or reg + reg addressing, but this is not visible from
 // the opcode.
+// Also used for LDRSB for which sandboxing works just as for LDRH.
 static void sandboxHalfwordOrDualwordLoadStore(const MCInst &Inst,
                                                const MCInstrInfo &II,
                                                MCRegister BaseReg,
@@ -437,10 +446,14 @@ static void sandboxHalfwordOrDualwordLoadStore(const MCInst &Inst,
   switch (Inst.getOpcode()) {
   case ARM::LDRH_POST:
   case ARM::LDRD_POST:
+  case ARM::LDRSB_POST:
+  case ARM::LDRSH_POST:
     postIncrement = true;
     [[fallthrough]];
   case ARM::LDRH_PRE:
   case ARM::LDRD_PRE:
+  case ARM::LDRSB_PRE:
+  case ARM::LDRSH_PRE:
     if (isRegRegAddressing) {
       return sandboxBaseRegScale(Inst, II, postIncrement, 0, MemIdx, BaseReg,
                                  Out, STI);
@@ -459,6 +472,8 @@ static void sandboxHalfwordOrDualwordLoadStore(const MCInst &Inst,
     break;
   case ARM::LDRH:
   case ARM::LDRD:
+  case ARM::LDRSB:
+  case ARM::LDRSH:
   case ARM::STRH:
   case ARM::STRD:
     if (isRegRegAddressing) {
@@ -575,6 +590,12 @@ void ARM::ARMMCNaClExpander::expandLoadStore(const MCInst &Inst,
   case ARM::LDRD:
   case ARM::LDRD_PRE:
   case ARM::LDRD_POST:
+  case ARM::LDRSB:
+  case ARM::LDRSB_PRE:
+  case ARM::LDRSB_POST:
+  case ARM::LDRSH:
+  case ARM::LDRSH_PRE:
+  case ARM::LDRSH_POST:
     return sandboxHalfwordOrDualwordLoadStore(Inst, *InstInfo, BaseReg,
                                               Inst.getOperand(0).getReg(),
                                               MemIdx, Out, STI);
