@@ -172,7 +172,7 @@ target_link_libraries(cxxabi_shared_objects PRIVATE cxx-headers ${LIBCXXABI_BUIL
 target_link_libraries(cxxabi_shared_objects PUBLIC cxxabi-headers)
 set_target_properties(cxxabi_shared_objects
   PROPERTIES
-    CXX_EXTENSIONS OFF
+    CXX_EXTENSIONS ON # @LOCALMOD: Turn ON
     CXX_STANDARD 20
     CXX_STANDARD_REQUIRED OFF
     COMPILE_FLAGS "${LIBCXXABI_COMPILE_FLAGS}"
@@ -254,7 +254,7 @@ target_link_libraries(cxxabi_static_objects PRIVATE cxx-headers ${LIBCXXABI_STAT
 target_link_libraries(cxxabi_static_objects PUBLIC cxxabi-headers)
 set_target_properties(cxxabi_static_objects
   PROPERTIES
-    CXX_EXTENSIONS OFF
+    CXX_EXTENSIONS ON # @LOCALMOD: Turn ON
     CXX_STANDARD 20
     CXX_STANDARD_REQUIRED OFF
     COMPILE_FLAGS "${LIBCXXABI_COMPILE_FLAGS}"
