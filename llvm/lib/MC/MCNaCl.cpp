@@ -88,8 +88,8 @@ void initializeNaClMCStreamer(MCStreamer &Streamer, MCContext &Ctx,
                                          ELF::SHF_ALLOC | ELF::SHF_GROUP,
                                          0, NoteName, /*IsComdat=*/true);
 
-  Streamer.PushSection();
-  Streamer.SwitchSection(Note);
+  Streamer.pushSection();
+  Streamer.switchSection(Note);
   Streamer.emitIntValue(strlen(NoteNamespace) + 1, 4);
   Streamer.emitIntValue(strlen(NoteArch) + 1, 4);
   Streamer.emitIntValue(ELF::NT_VERSION, 4);
@@ -99,7 +99,7 @@ void initializeNaClMCStreamer(MCStreamer &Streamer, MCContext &Ctx,
   Streamer.emitBytes(NoteArch);
   Streamer.emitIntValue(0, 1); // NUL terminator
   Streamer.emitValueToAlignment(4);
-  Streamer.PopSection();
+  Streamer.popSection();
 }
 
 } // namespace llvm
