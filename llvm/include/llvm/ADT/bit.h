@@ -14,6 +14,7 @@
 #ifndef LLVM_ADT_BIT_H
 #define LLVM_ADT_BIT_H
 
+#include <cstdint>  // @LOCALMOD, but this just to fix an upstream bug
 #include <cstring>
 #include <type_traits>
 
