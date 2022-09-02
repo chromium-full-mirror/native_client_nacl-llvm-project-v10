@@ -58,7 +58,7 @@ class MCAsmStreamer final : public MCStreamer {
   unsigned IsVerboseAsm : 1;
   unsigned ShowInst : 1;
   unsigned UseDwarfDirectory : 1;
-  unsigned BundleLocked : 1; // @LOCALMOD
+  unsigned BundleLocked : 1 = false; // @LOCALMOD
 
   void EmitRegisterName(int64_t Register);
   void PrintQuotedString(StringRef Data, raw_ostream &OS) const;
