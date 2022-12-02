@@ -14,6 +14,8 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringSwitch.h"
 
+#include <cctype> // @LOCALMOD to fix compile
+
 using namespace llvm;
 
 StringRef ARM::getArchSynonym(StringRef Arch) {
