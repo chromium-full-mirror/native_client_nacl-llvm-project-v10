@@ -16,6 +16,7 @@
 #include "llvm/MC/MCSectionELF.h"
 #include "llvm/MC/MCStreamer.h"
 #include "llvm/MC/TargetRegistry.h"
+#include "llvm/Support/Alignment.h"
 #include "llvm/Support/CommandLine.h"
 
 static const char NoteNamespace[] = "NaCl";
@@ -32,27 +33,27 @@ void initializeNaClMCStreamer(MCStreamer &Streamer, MCContext &Ctx,
   assert(TheTriple.isOSNaCl());
   const char *NoteName;
   const char *NoteArch;
-  unsigned BundleAlign;
+  Align BundleAlign;
   switch (TheTriple.getArch()) {
     case Triple::arm:
       NoteName = ".note.NaCl.ABI.arm";
       NoteArch = "arm";
-      BundleAlign = 4;
+      BundleAlign = Align(16);
       break;
     case Triple::mipsel:
       NoteName = ".note.NaCl.ABI.mipsel";
       NoteArch = "mipsel";
-      BundleAlign = 4;
+      BundleAlign = Align(16);
       break;
     case Triple::x86:
       NoteName = ".note.NaCl.ABI.x86-32";
       NoteArch = "x86-32";
-      BundleAlign = 5;
+      BundleAlign = Align(32);
       break;
     case Triple::x86_64:
       NoteName = ".note.NaCl.ABI.x86-64";
       NoteArch = "x86-64";
-      BundleAlign = 5;
+      BundleAlign = Align(32);
       break;
     default:
       report_fatal_error("Unsupported architecture for NaCl");
@@ -95,10 +96,10 @@ void initializeNaClMCStreamer(MCStreamer &Streamer, MCContext &Ctx,
   Streamer.emitIntValue(ELF::NT_VERSION, 4);
   Streamer.emitBytes(NoteNamespace);
   Streamer.emitIntValue(0, 1); // NUL terminator
-  Streamer.emitValueToAlignment(4);
+  Streamer.emitValueToAlignment(Align(4));
   Streamer.emitBytes(NoteArch);
   Streamer.emitIntValue(0, 1); // NUL terminator
-  Streamer.emitValueToAlignment(4);
+  Streamer.emitValueToAlignment(Align(4));
   Streamer.popSection();
 }
 
