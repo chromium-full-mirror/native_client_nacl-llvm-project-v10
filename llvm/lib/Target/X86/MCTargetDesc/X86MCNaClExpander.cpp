@@ -24,6 +24,7 @@
 #include "llvm/MC/MCRegisterInfo.h"
 #include "llvm/MC/MCObjectFileInfo.h"
 #include "llvm/MC/MCStreamer.h"
+#include "llvm/Support/Alignment.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/Debug.h"
 
@@ -216,7 +217,7 @@ void X86::X86MCNaClExpander::expandDirectCall(const MCInst &Inst,
     JMPInst.addOperand(Inst.getOperand(0));
     Out.emitInstruction(JMPInst, STI);
 
-    Out.emitCodeAlignment(kBundleSize, &STI);
+    Out.emitCodeAlignment(Align(kBundleSize), &STI);
     Out.emitLabel(RetTarget);
   } else {
     // Emit a nop in case the call is the first instruction of the function.
@@ -273,7 +274,7 @@ void X86::X86MCNaClExpander::emitIndirectCallReg(MCRegister Reg, MCStreamer &Out
     Out.emitInstruction(Jmp, STI);
     Out.emitBundleUnlock();
 
-    Out.emitCodeAlignment(kBundleSize, &STI);
+    Out.emitCodeAlignment(Align(kBundleSize), &STI);
     Out.emitLabel(RetTarget);
   } else {
     // Emit a nop in case the call is the first instruction of the function.
