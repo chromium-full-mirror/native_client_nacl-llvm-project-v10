@@ -321,13 +321,13 @@ const classnames ClassNames[] =
 {
     {"alnum",  ctype_base::alnum},
     {"alpha",  ctype_base::alpha},
-    {"blank",  ctype_base::blank},
+    {"blank",  static_cast<regex_traits<char>::char_class_type>(ctype_base::blank)}, // @LOCALMOD: Add static cast
     {"cntrl",  ctype_base::cntrl},
     {"d",      ctype_base::digit},
     {"digit",  ctype_base::digit},
     {"graph",  ctype_base::graph},
     {"lower",  ctype_base::lower},
-    {"print",  ctype_base::print},
+    {"print",  static_cast<regex_traits<char>::char_class_type>(ctype_base::print)}, // @LOCALMOD: Add static cast
     {"punct",  ctype_base::punct},
     {"s",      ctype_base::space},
     {"space",  ctype_base::space},
