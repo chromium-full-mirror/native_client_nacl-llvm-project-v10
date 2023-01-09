@@ -166,18 +166,34 @@ inline _LIBCPP_HIDE_FROM_ABI typename __promote<_A1, _A2>::type nextafter(_A1 __
 
 // nexttoward
 
+#if defined(_NEWLIB_VERSION) // @LOCALMOD-START
+// Missing from newlib. Note that NaCl represents ``long double`` as
+// ``double``, hence the intrinsic's type.
+inline _LIBCPP_HIDE_FROM_ABI float nexttoward(float __x, long double __y) _NOEXCEPT {
+  return __builtin_nexttoward(__x, __y);
+}
+#else
 inline _LIBCPP_HIDE_FROM_ABI float nexttoward(float __x, long double __y) _NOEXCEPT {
   return __builtin_nexttowardf(__x, __y);
 }
+#endif // @LOCALMOD-END
 
 template <class = int>
 _LIBCPP_HIDE_FROM_ABI double nexttoward(double __x, long double __y) _NOEXCEPT {
   return __builtin_nexttoward(__x, __y);
 }
 
+#if defined(_NEWLIB_VERSION) // @LOCALMOD-START
+// Missing from newlib. Note that NaCl represents ``long double`` as
+// ``double``, hence the intrinsic's type.
+inline _LIBCPP_HIDE_FROM_ABI long double nexttoward(long double __x, long double __y) _NOEXCEPT {
+  return __builtin_nexttoward(__x, __y);
+}
+#else
 inline _LIBCPP_HIDE_FROM_ABI long double nexttoward(long double __x, long double __y) _NOEXCEPT {
   return __builtin_nexttowardl(__x, __y);
 }
+#endif // @LOCALMOD-END
 
 template <class _A1, __enable_if_t<is_integral<_A1>::value, int> = 0>
 inline _LIBCPP_HIDE_FROM_ABI double nexttoward(_A1 __x, long double __y) _NOEXCEPT {
