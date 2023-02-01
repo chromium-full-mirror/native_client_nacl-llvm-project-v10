@@ -760,6 +760,11 @@ _LIBCPP_BEGIN_NAMESPACE_STD _LIBCPP_END_NAMESPACE_STD
 #  elif defined(__ANDROID__) && __ANDROID_API__ < 28
 // Android only provides aligned_alloc when targeting API 28 or higher.
 #    define _LIBCPP_HAS_NO_C11_ALIGNED_ALLOC
+// @LOCALMOD-START
+// NaCl does not provide aligned_alloc
+#  elif defined(__native_client__)
+#    define _LIBCPP_HAS_NO_C11_ALIGNED_ALLOC
+// @LOCALMOD-END
 #  endif
 
 #  if defined(__APPLE__) || defined(__FreeBSD__)
