@@ -12,9 +12,10 @@
 
 #include "llvm/MC/MCParser/MCAsmParserExtension.h"
 #include "llvm/MC/MCNaClExpander.h"
-#include "llvm/MC/MCStreamer.h"
 #include "llvm/MC/MCParser/MCAsmLexer.h"
 #include "llvm/MC/MCParser/MCTargetAsmParser.h"
+#include "llvm/MC/MCRegister.h"
+#include "llvm/MC/MCStreamer.h"
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/raw_ostream.h"
 
@@ -42,12 +43,12 @@ class NaClAsmParser : public MCAsmParserExtension {
   /// ::= {.scratch} reg
   bool ParseScratch(StringRef Directive, SMLoc Loc) {
     getParser().checkForValidSection();
-    unsigned RegNo;
+    MCRegister RegNo;
     const char *kInvalidOptionError =
         "expected register name after '.scratch' directive";
 
     if (getLexer().isNot(AsmToken::EndOfStatement)) {
-      if (getParser().getTargetParser().ParseRegister(RegNo, Loc, Loc))
+      if (getParser().getTargetParser().parseRegister(RegNo, Loc, Loc))
         return Error(Loc, kInvalidOptionError);
 
       else if (getLexer().isNot(AsmToken::EndOfStatement))
