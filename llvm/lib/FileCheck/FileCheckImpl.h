@@ -286,6 +286,13 @@ public:
       : Name(Name), ImplicitFormat(ImplicitFormat),
         DefLineNumber(DefLineNumber) {}
 
+  // @LOCALMOD - Add explicit copy constructor to make this compile
+  NumericVariable(NumericVariable &nv) : Name(nv.getName()),
+                                         ImplicitFormat(nv.getImplicitFormat()),
+                                         Value(nv.getValue()),
+                                         StrValue(nv.getStringValue()),
+                                         DefLineNumber(nv.getDefLineNumber()) {}
+
   /// \returns name of this numeric variable.
   StringRef getName() const { return Name; }
 
@@ -293,7 +300,13 @@ public:
   ExpressionFormat getImplicitFormat() const { return ImplicitFormat; }
 
   /// \returns this variable's value.
-  std::optional<ExpressionValue> getValue() const { return Value; }
+  // @LOCALMOD: Refactor this function to satisfy Windows compiler.
+  std::optional<ExpressionValue> getValue() const {
+    if (!Value) {
+      return std::nullopt;
+    }
+    return Value.value();
+  }
 
   /// \returns the input buffer's string from which this variable's value was
   /// parsed, or std::nullopt if the value is not yet defined or was not parsed
