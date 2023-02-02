@@ -238,6 +238,13 @@ public:
       : Name(Name), ImplicitFormat(ImplicitFormat),
         DefLineNumber(DefLineNumber) {}
 
+  // @LOCALMOD - Add explicit copy constructor to make this compile
+  NumericVariable(NumericVariable &nv) : Name(nv.getName()),
+                                         ImplicitFormat(nv.getImplicitFormat()),
+                                         Value(nv.getValue()),
+                                         StrValue(nv.getStringValue()),
+                                         DefLineNumber(nv.getDefLineNumber()) {}
+
   /// \returns name of this numeric variable.
   StringRef getName() const { return Name; }
 
