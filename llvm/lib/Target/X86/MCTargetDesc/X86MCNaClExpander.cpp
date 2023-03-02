@@ -51,7 +51,7 @@ namespace {
 MCRegister getReg32(MCRegister Reg) {
   switch (Reg) {
   default:
-    return getX86SubSuperRegisterOrZero(Reg, 32, false);
+    return getX86SubSuperRegister(Reg, 32, false);
   case X86::IP:
   case X86::EIP:
     return X86::EIP;
@@ -63,7 +63,7 @@ MCRegister getReg32(MCRegister Reg) {
 MCRegister getReg64(MCRegister Reg) {
   switch (Reg) {
   default:
-    return getX86SubSuperRegisterOrZero(Reg, 64, false);
+    return getX86SubSuperRegister(Reg, 64, false);
   case X86::IP:
   case X86::EIP:
   case X86::RIP:
@@ -620,7 +620,7 @@ void X86::X86MCNaClExpander::expandLoadStore(const MCInst &Inst,
     RotateRegister = SandboxedInst.getOperand(0).getReg();
     SandboxedInst.setOpcode(X86::MOV8rm);
     SandboxedInst.getOperand(0).setReg(
-        getX86SubSuperRegisterOrZero(RotateRegister, 8, /*High=*/false));
+        getX86SubSuperRegister(RotateRegister, 8, /*High=*/false));
   } else if (InstNeedsSandboxing &&
              (SandboxedInst.getOpcode() == X86::MOV8mr_NOREX ||
               SandboxedInst.getOpcode() == X86::MOV8mr) &&
@@ -628,7 +628,7 @@ void X86::X86MCNaClExpander::expandLoadStore(const MCInst &Inst,
     RotateRegister = SandboxedInst.getOperand(5).getReg();
     SandboxedInst.setOpcode(X86::MOV8mr);
     SandboxedInst.getOperand(5).setReg(
-        getX86SubSuperRegisterOrZero(RotateRegister, 8, /*High=*/false));
+        getX86SubSuperRegister(RotateRegister, 8, /*High=*/false));
   }
 
   if (RotateRegister != X86::NoRegister) {
