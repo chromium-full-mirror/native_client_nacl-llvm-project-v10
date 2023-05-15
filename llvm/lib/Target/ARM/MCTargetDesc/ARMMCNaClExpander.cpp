@@ -238,7 +238,7 @@ void ARM::ARMMCNaClExpander::expandStackManipulation(
 
 static int getMemIdx(const MCInst &Inst, const MCInstrInfo &InstInfo) {
   unsigned Opc = Inst.getOpcode();
-  const MCOperandInfo *OpInfo = InstInfo.get(Opc).OpInfo;
+  const llvm::ArrayRef<llvm::MCOperandInfo> OpInfo = InstInfo.get(Opc).operands();
   for (int i = 0, e = Inst.getNumOperands(); i < e; i++) {
     if (OpInfo[i].OperandType == MCOI::OPERAND_MEMORY) {
       return i;
