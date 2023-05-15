@@ -549,7 +549,7 @@ bool X86::X86MCNaClExpander::emitSandboxMemOps(MCInst &Inst,
                                                const MCSubtargetInfo &STI,
                                                bool EmitInstructions) {
 
-  const MCOperandInfo *OpInfo = InstInfo->get(Inst.getOpcode()).OpInfo;
+  const llvm::ArrayRef<llvm::MCOperandInfo> OpInfo = InstInfo->get(Inst.getOpcode()).operands();
 
   bool anyInstsEmitted = false;
 
@@ -727,7 +727,7 @@ static void demoteInst(MCInst &Inst, const MCInstrInfo &InstInfo) {
   unsigned NewOpc = demoteOpcode(Inst.getOpcode());
   Inst.setOpcode(NewOpc);
   // demote all general purpose 64 bit registers to 32 bits
-  const MCOperandInfo *OpInfo = InstInfo.get(Inst.getOpcode()).OpInfo;
+  const llvm::ArrayRef<llvm::MCOperandInfo> OpInfo = InstInfo.get(Inst.getOpcode()).operands();
   for (int i = 0, e = Inst.getNumOperands(); i < e; ++i) {
     if (OpInfo[i].OperandType == MCOI::OPERAND_REGISTER) {
       assert(Inst.getOperand(i).isReg());
