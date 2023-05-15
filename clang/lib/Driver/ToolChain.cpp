@@ -87,7 +87,8 @@ ToolChain::ToolChain(const Driver &D, const llvm::Triple &T,
   };
 
   // @LOCALMOD-START
-  addIfExists(getLibraryPaths(), getArchSpecificLibPath());
+  for (const auto &Path : getArchSpecificLibPaths())
+    addIfExists(getLibraryPaths(), Path);
   // @LOCALMOD-END
 
   if (std::optional<std::string> Path = getRuntimePath())
