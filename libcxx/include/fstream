@@ -197,7 +197,7 @@ typedef basic_fstream<wchar_t> wfstream;
 #include <__utility/swap.h>
 #include <__utility/unreachable.h>
 #include <cstdio>
-#include <filesystem>
+//#include <filesystem> @LOCALMOD - we don't build this header
 #include <istream>
 #include <ostream>
 #include <typeinfo>
@@ -214,7 +214,7 @@ _LIBCPP_PUSH_MACROS
 #  define _LIBCPP_HAS_NO_OFF_T_FUNCTIONS
 #endif
 
-#if !defined(_LIBCPP_HAS_NO_FILESYSTEM)
+#if !defined(_LIBCPP_HAS_NO_FILESYSTEM) || defined(__native_client__)//@LOCALMOD
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
@@ -258,7 +258,7 @@ public:
 #  endif
   _LIBCPP_HIDE_FROM_ABI basic_filebuf* open(const string& __s, ios_base::openmode __mode);
 
-#  if _LIBCPP_STD_VER >= 17
+#  if _LIBCPP_STD_VER >= 17 && !defined(__native_client__) // @LOCALMOD
   _LIBCPP_AVAILABILITY_FILESYSTEM_LIBRARY _LIBCPP_HIDE_FROM_ABI basic_filebuf*
   open(const filesystem::path& __p, ios_base::openmode __mode) {
     return open(__p.c_str(), __mode);
@@ -1101,7 +1101,7 @@ public:
   _LIBCPP_HIDE_FROM_ABI explicit basic_ifstream(const wchar_t* __s, ios_base::openmode __mode = ios_base::in);
 #  endif
   _LIBCPP_HIDE_FROM_ABI explicit basic_ifstream(const string& __s, ios_base::openmode __mode = ios_base::in);
-#  if _LIBCPP_STD_VER >= 17
+#  if _LIBCPP_STD_VER >= 17 && !defined(__native_client__) // @LOCALMOD
   template <class _Tp, class = enable_if_t<is_same_v<_Tp, filesystem::path>>>
   _LIBCPP_AVAILABILITY_FILESYSTEM_LIBRARY _LIBCPP_HIDE_FROM_ABI explicit basic_ifstream(
       const _Tp& __p, ios_base::openmode __mode = ios_base::in)
@@ -1121,7 +1121,7 @@ public:
   void open(const wchar_t* __s, ios_base::openmode __mode = ios_base::in);
 #  endif
   void open(const string& __s, ios_base::openmode __mode = ios_base::in);
-#  if _LIBCPP_STD_VER >= 17
+#  if _LIBCPP_STD_VER >= 17 && !defined(__native_client__) // @LOCALMOD
   _LIBCPP_AVAILABILITY_FILESYSTEM_LIBRARY _LIBCPP_HIDE_FROM_ABI void
   open(const filesystem::path& __p, ios_base::openmode __mode = ios_base::in) {
     return open(__p.c_str(), __mode);
@@ -1256,7 +1256,7 @@ public:
 #  endif
   _LIBCPP_HIDE_FROM_ABI explicit basic_ofstream(const string& __s, ios_base::openmode __mode = ios_base::out);
 
-#  if _LIBCPP_STD_VER >= 17
+#  if _LIBCPP_STD_VER >= 17 && !defined(__native_client__) // @LOCALMOD
   template <class _Tp, class = enable_if_t<is_same_v<_Tp, filesystem::path>>>
   _LIBCPP_AVAILABILITY_FILESYSTEM_LIBRARY _LIBCPP_HIDE_FROM_ABI explicit basic_ofstream(
       const _Tp& __p, ios_base::openmode __mode = ios_base::out)
@@ -1278,7 +1278,7 @@ public:
 #  endif
   void open(const string& __s, ios_base::openmode __mode = ios_base::out);
 
-#  if _LIBCPP_STD_VER >= 17
+#  if _LIBCPP_STD_VER >= 17 && !defined(__native_client__) // @LOCALMOD
   _LIBCPP_AVAILABILITY_FILESYSTEM_LIBRARY _LIBCPP_HIDE_FROM_ABI void
   open(const filesystem::path& __p, ios_base::openmode __mode = ios_base::out) {
     return open(__p.c_str(), __mode);
@@ -1416,7 +1416,7 @@ public:
   _LIBCPP_HIDE_FROM_ABI explicit basic_fstream(const string& __s,
                                                ios_base::openmode __mode = ios_base::in | ios_base::out);
 
-#  if _LIBCPP_STD_VER >= 17
+#  if _LIBCPP_STD_VER >= 17 && !defined(__native_client__) // @LOCALMOD
   template <class _Tp, class = enable_if_t<is_same_v<_Tp, filesystem::path>>>
   _LIBCPP_AVAILABILITY_FILESYSTEM_LIBRARY _LIBCPP_HIDE_FROM_ABI explicit basic_fstream(
       const _Tp& __p, ios_base::openmode __mode = ios_base::in | ios_base::out)
@@ -1440,7 +1440,7 @@ public:
 #  endif
   _LIBCPP_HIDE_FROM_ABI void open(const string& __s, ios_base::openmode __mode = ios_base::in | ios_base::out);
 
-#  if _LIBCPP_STD_VER >= 17
+#  if _LIBCPP_STD_VER >= 17 && !defined(__native_client__) // @LOCALMOD
   _LIBCPP_AVAILABILITY_FILESYSTEM_LIBRARY _LIBCPP_HIDE_FROM_ABI void
   open(const filesystem::path& __p, ios_base::openmode __mode = ios_base::in | ios_base::out) {
     return open(__p.c_str(), __mode);
