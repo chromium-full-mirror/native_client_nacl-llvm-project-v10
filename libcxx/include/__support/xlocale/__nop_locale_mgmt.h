@@ -12,6 +12,8 @@
 
 #include <__config>
 
+#define NULL 0 // @LOCALMOD
+
 #ifdef __cplusplus
 extern "C" {
 #endif
