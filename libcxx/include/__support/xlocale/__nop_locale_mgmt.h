@@ -12,6 +12,8 @@
 
 #include <__config>
 
+#define NULL 0 // @LOCALMOD
+
 // Patch over lack of extended locale support
 typedef void* locale_t;
 
