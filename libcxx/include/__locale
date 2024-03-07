@@ -12,7 +12,6 @@
 
 #include <__availability>
 #include <__config>
-#include <__locale_dir/locale_base_api.h>
 #include <__memory/shared_ptr.h> // __shared_count
 #include <__mutex/once_flag.h>
 #include <__type_traits/make_unsigned.h>
@@ -26,6 +25,8 @@
 // Some platforms require more includes than others. Keep the includes on all plaforms for now.
 #include <cstddef>
 #include <cstring>
+
+#include <__locale_dir/locale_base_api.h> // @LOCALMOD: Change order of includes
 
 #ifndef _LIBCPP_HAS_NO_WIDE_CHARACTERS
 #  include <cwchar>
