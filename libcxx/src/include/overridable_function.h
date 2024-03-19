@@ -79,7 +79,12 @@ _LIBCPP_END_NAMESPACE_STD
     _LIBCPP_END_NAMESPACE_STD                                                                                          \
     static type symbol##_impl__ arglist
 
-#elif defined(_LIBCPP_OBJECT_FORMAT_ELF)
+// @LOCALMOD - this would add a new section to elf files, and our linker doesn't
+// fill the space leading up to it correctly. Since we don't need the section
+// (it is to fix an overridden throwing new, which chromium doesn't have),
+// just don't use it.
+
+#elif defined(_LIBCPP_OBJECT_FORMAT_ELF) && !defined(__native_client__)
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
