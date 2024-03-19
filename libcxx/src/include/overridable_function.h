@@ -86,7 +86,11 @@ _LIBCPP_HIDE_FROM_ABI bool __is_function_overridden(_Ret (*__fptr)(_Args...)) no
 }
 _LIBCPP_END_NAMESPACE_STD
 
-#elif defined(_LIBCPP_OBJECT_FORMAT_ELF)
+// @LOCALMOD - this would add a new section to elf files, and our linker doesn't
+// fill the space leading up to it correctly. Since we don't need the section
+// (it is to fix an overridden throwing new, which chromium doesn't have),
+// just don't use it.
+#elif defined(_LIBCPP_OBJECT_FORMAT_ELF) && !defined(__native_client__)
 
 #  define _LIBCPP_CAN_DETECT_OVERRIDDEN_FUNCTION 1
 #  define _LIBCPP_MAKE_OVERRIDABLE_FUNCTION_DETECTABLE __attribute__((__section__("__lcxx_override")))
