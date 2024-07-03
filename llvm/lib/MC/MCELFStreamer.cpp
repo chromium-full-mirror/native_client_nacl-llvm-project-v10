@@ -536,6 +536,7 @@ void MCELFStreamer::emitInstToData(const MCInst &Inst,
   MCDataFragment *DF;
 
   if (Assembler.isBundlingEnabled()) {
+    assert(!Assembler.getRelaxAll()) // @LOCALMOD
     MCSection &Sec = *getCurrentSectionOnly();
     if (isBundleLocked() && !Sec.isBundleGroupBeforeFirstInst()) {
       // If we are bundle-locked, we re-use the current fragment.
