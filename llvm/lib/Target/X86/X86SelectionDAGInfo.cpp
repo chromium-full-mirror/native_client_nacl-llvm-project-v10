@@ -49,10 +49,11 @@ SDValue X86SelectionDAGInfo::EmitTargetCodeForMemset(
     SDValue Size, Align Alignment, bool isVolatile, bool AlwaysInline,
     MachinePointerInfo DstPtrInfo) const {
 
-  // @LOCALMOD-BEGIN
+  // @LOCALMOD: Moved variable declaration so it can be used earlier.
   const X86Subtarget &Subtarget =
     DAG.getMachineFunction().getSubtarget<X86Subtarget>();
 
+  // @LOCALMOD-BEGIN
   if (Subtarget.isTargetNaCl())
     return SDValue();
   // @LOCALMOD-END
@@ -68,8 +69,6 @@ SDValue X86SelectionDAGInfo::EmitTargetCodeForMemset(
     return SDValue();
 
   ConstantSDNode *ConstantSize = dyn_cast<ConstantSDNode>(Size);
-  const X86Subtarget &Subtarget =
-      DAG.getMachineFunction().getSubtarget<X86Subtarget>();
 
   // If not DWORD aligned or size is more than the threshold, call the library.
   // The libc version is likely to be faster for these cases. It can use the
