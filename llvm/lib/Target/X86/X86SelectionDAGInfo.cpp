@@ -210,10 +210,11 @@ SDValue X86SelectionDAGInfo::EmitTargetCodeForMemset(
     SDValue Size, Align Alignment, bool isVolatile, bool AlwaysInline,
     MachinePointerInfo DstPtrInfo) const {
 
-  // @LOCALMOD-BEGIN
+  // @LOCALMOD: Moved variable declaration so it can be used earlier.
   const X86Subtarget &Subtarget =
     DAG.getMachineFunction().getSubtarget<X86Subtarget>();
 
+  // @LOCALMOD-BEGIN
   if (Subtarget.isTargetNaCl())
     return SDValue();
   // @LOCALMOD-END
