@@ -233,8 +233,7 @@ SDValue X86SelectionDAGInfo::EmitTargetCodeForMemset(
   if (!ConstantSize)
     return SDValue();
 
-  const X86Subtarget &Subtarget =
-      DAG.getMachineFunction().getSubtarget<X86Subtarget>();
+  // @LOCALMOD - previous location of the moved variable declaration.
   return emitConstantSizeRepstos(
       DAG, Subtarget, dl, Chain, Dst, Val, ConstantSize->getZExtValue(),
       Size.getValueType(), Alignment, isVolatile, AlwaysInline, DstPtrInfo);
