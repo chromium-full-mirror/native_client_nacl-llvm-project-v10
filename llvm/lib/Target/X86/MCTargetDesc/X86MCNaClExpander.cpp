@@ -1234,8 +1234,8 @@ static unsigned demoteOpcode(unsigned Opcode) {
     return X86::PEXT32rr;
   case X86::PEXT64rm:
     return X86::PEXT32rm;
-  case X86::PEXTRQrr:
-    return X86::PEXTRQrr;
+  case X86::PEXTRQrri:
+    return X86::PEXTRQrri;
   case X86::POPCNT64rr:
     return X86::POPCNT32rr;
   case X86::POPCNT64rm:
@@ -1451,8 +1451,8 @@ static unsigned demoteOpcode(unsigned Opcode) {
     return X86::VMWRITE32rr;
   case X86::VMWRITE64rm:
     return X86::VMWRITE32rm;
-  case X86::VPEXTRQrr:
-    return X86::VPEXTRQrr;
+  case X86::VPEXTRQrri:
+    return X86::VPEXTRQrri;
   case X86::WRFSBASE64:
     return X86::WRFSBASE;
   case X86::WRGSBASE64:
