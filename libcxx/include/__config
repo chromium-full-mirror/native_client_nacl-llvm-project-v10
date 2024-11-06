@@ -671,17 +671,17 @@ typedef __char32_t char32_t;
         (defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) &&                                                    \
          __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__ < 130000)
 #      define _LIBCPP_HAS_C11_ALIGNED_ALLOC 0
-// @LOCALMOD-START
-// NaCl does not provide aligned_alloc
-#  elif defined(__native_client__)
-#    define _LIBCPP_HAS_C11_ALIGNED_ALLOC 0
-// @LOCALMOD-END
 #    else
 #      define _LIBCPP_HAS_C11_ALIGNED_ALLOC 1
 #    endif
 #  elif defined(__ANDROID__) && __ANDROID_API__ < 28
 // Android only provides aligned_alloc when targeting API 28 or higher.
 #    define _LIBCPP_HAS_C11_ALIGNED_ALLOC 0
+// @LOCALMOD-START
+// NaCl does not provide aligned_alloc
+#  elif defined(__native_client__)
+#    define _LIBCPP_HAS_C11_ALIGNED_ALLOC 0
+// @LOCALMOD-END
 #  else
 #    define _LIBCPP_HAS_C11_ALIGNED_ALLOC 1
 #  endif
