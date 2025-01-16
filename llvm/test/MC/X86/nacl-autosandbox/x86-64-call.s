@@ -9,7 +9,7 @@ foo:
 
 //HIDEBASE:      pushq $.LDirectCallRetAddr{{[0-9]+}}
 //HIDEBASE-NEXT: jmp foo
-//HIDEBASE-NEXT: .p2align	5, 0x90
+//HIDEBASE-NEXT: .p2align	5
 //HIDEBASE-NEXT: .LDirectCallRetAddr{{[0-9]+}}:
 
 	call *%rax
@@ -21,7 +21,7 @@ foo:
 //HIDEBASE-NEXT: addq	%r15, %r11
 //HIDEBASE-NEXT: jmpq	*%r11
 //HIDEBASE-NEXT: .bundle_unlock
-//HIDEBASE-NEXT: .p2align	5, 0x90
+//HIDEBASE-NEXT: .p2align	5
 //HIDEBASE-NEXT: .LIndirectCallRetAddr{{[0-9]+}}:
 
 	call *12(%rsp)
@@ -33,7 +33,7 @@ foo:
 //HIDEBASE-NEXT: addq	%r15, %r11
 //HIDEBASE-NEXT: jmpq	*%r11
 //HIDEBASE-NEXT: .bundle_unlock
-//HIDEBASE-NEXT: .p2align	5, 0x90
+//HIDEBASE-NEXT: .p2align	5
 //HIDEBASE-NEXT: .LIndirectCallRetAddr{{[0-9]+}}
 
 	call *131072(%rax, %rdi, 8)
@@ -48,5 +48,5 @@ foo:
 //HIDEBASE-NEXT: addq	%r15, %r11
 //HIDEBASE-NEXT: jmpq	*%r11
 //HIDEBASE-NEXT: .bundle_unlock
-//HIDEBASE-NEXT: .p2align	5, 0x90
+//HIDEBASE-NEXT: .p2align	5
 //HIDEBASE-NEXT: .LIndirectCallRetAddr{{[0-9]+}}:
