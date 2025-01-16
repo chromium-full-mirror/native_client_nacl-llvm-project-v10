@@ -1,5 +1,6 @@
-// RUN: llvm-mc -triple aarch64-apple-ios -o - -filetype=obj %s | \
-// RUN:   llvm-readobj --symbols - | FileCheck %s -check-prefix=READOBJ
+// @LOCALMOD: feature is disabled
+//  llvm-mc -triple aarch64-apple-ios -o - -filetype=obj %s | \
+//    llvm-readobj --symbols - | FileCheck %s -check-prefix=READOBJ
 
 // READOBJ-LABEL: Name: cold_func
 // READOBJ-NEXT: Type: Section
