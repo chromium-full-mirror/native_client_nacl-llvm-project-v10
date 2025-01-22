@@ -582,9 +582,9 @@ int main(int argc, char **argv) {
     // @LOCALMOD-BEGIN
     Triple T(TripleName);
     if (T.isOSNaCl()) {
-      // It is possible we need to replace InitSections with switchSection here
+      // It is possible we need to replace initSections with switchSection here
       // and further above.
-      Str->InitSections(NoExecStack, *STI);
+      Str->initSections(NoExecStack, *STI);
       initializeNaClMCStreamer(*Str.get(), Ctx, T);
     }
     // @LOCALMOD-END
