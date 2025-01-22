@@ -19104,9 +19104,8 @@ LowerToTLSExecCall(GlobalAddressSDNode *GA, SelectionDAG &DAG,
     llvm_unreachable("Unknown TLS model");
   }
 
-  return GetTLSADDR(DAG, DAG.getEntryNode(), GA, NULL, PtrVT,
-                    X86::EAX, // PtrVT is 32-bit.
-                    TargetFlag, false, Opcode);
+  return GetTLSADDR(DAG, GA, PtrVT, X86::EAX, // PtrVT is 32-bit.
+                    TargetFlag, false, false, Opcode);
 }
 // @LOCALMOD-END
 
