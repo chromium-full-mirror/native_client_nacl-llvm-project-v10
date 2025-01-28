@@ -11,6 +11,7 @@
 #define _LIBCPP___LOCALE
 
 #include <__config>
+#include <__locale_dir/locale_base_api.h>
 #include <__memory/shared_count.h>
 #include <__mutex/once_flag.h>
 #include <__type_traits/make_unsigned.h>
@@ -26,7 +27,6 @@
 #include <cstddef>
 #include <cstring>
 
-#include <__locale_dir/locale_base_api.h> // @LOCALMOD: Change order of includes
 
 #if _LIBCPP_HAS_WIDE_CHARACTERS
 #  include <cwchar>
